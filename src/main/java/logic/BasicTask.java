@@ -1,5 +1,6 @@
 package logic;
 
+import entities.Priority;
 import entities.Task;
 
 import java.time.LocalDate;
@@ -7,11 +8,11 @@ import java.time.LocalDate;
 public class BasicTask implements Task, Cloneable{
     private int id;
     private String description;
-    private int priority; //could get changed
+    private Priority priority; //could get changed
     private LocalDate entryDate;
     private LocalDate completionDate;
 
-    public BasicTask(int id, String label, int priority) {
+    public BasicTask(int id, String label, Priority priority) {
         this.id = id;
         this.description = label;
         this.priority = priority;
@@ -36,7 +37,7 @@ public class BasicTask implements Task, Cloneable{
     }
 
     @Override
-    public int getPriority() {
+    public Priority getPriority() {
         return this.priority;
     }
 

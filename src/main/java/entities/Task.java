@@ -7,6 +7,6 @@ public interface Task{
     int completionTimeFromSet();
     int completionTimeFromCustom(LocalDate date);
     int getId();
-    int getPriority();
+    Priority getPriority();
     String getDescription();
 }
