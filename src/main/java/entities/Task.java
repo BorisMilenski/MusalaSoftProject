@@ -8,5 +8,5 @@ public interface Task{
     int completionTimeFromCustom(LocalDate date);
     int getId();
     int getPriority();
-    String getLabel();
+    String getDescription();
 }

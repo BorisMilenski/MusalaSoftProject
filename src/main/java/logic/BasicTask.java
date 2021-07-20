@@ -13,7 +13,7 @@ public class BasicTask implements Task, Cloneable{
 
     public BasicTask(int id, String label, int priority) {
         this.id = id;
-        this.label = label;
+        this.description = label;
         this.priority = priority;
         this.entryDate = LocalDate.now();
     }
@@ -41,11 +41,11 @@ public class BasicTask implements Task, Cloneable{
     }
 
     @Override
-    public String getLabel() {
-        return this.label;
+    public String getDescription() {
+        return this.description;
     }
 
     public BasicTask clone(){
-        return new BasicTask(this.id, this.label,this.priority);
+        return new BasicTask(this.id, this.description,this.priority);
     }
 }
