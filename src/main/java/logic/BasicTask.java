@@ -19,7 +19,7 @@ public class BasicTask implements Task, Cloneable{
     }
 
     public boolean isCompleted() {
-        return false;
+        return completionDate != null;
     }
 
     public int completionTimeFromSet() {
