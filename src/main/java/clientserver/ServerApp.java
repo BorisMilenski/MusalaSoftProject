@@ -32,8 +32,30 @@ public class ServerApp {
                     tasks.add(task1);
                     tasks.add(task2);
                     tasks.add(task3);
+                    ArrayList<Task> completed = new ArrayList<Task>();
+                    ArrayList<Task> notCompleted = new ArrayList<Task>();
                     for (Task task : tasks) {
-                        messageToClient.println(task);
+                        if (task.isCompleted()) {
+                            completed.add(task);
+                        } else {
+                            notCompleted.add(task);
+                        }
+                    }
+                    messageToClient.println("[+] Completed tasks:");
+                    if (completed.isEmpty()) {
+                        messageToClient.println("None");
+                    } else {
+                        for (Task task : completed) {
+                            messageToClient.println(task);
+                        }
+                    }
+                    messageToClient.println("[*] Remaining tasks:");
+                    if (notCompleted.isEmpty()) {
+                        messageToClient.println("None");
+                    } else {
+                        for (Task task : notCompleted) {
+                            messageToClient.println(task);
+                        }
                     }
                     messageToClient.println(">>");
                     input = userInputReader.readLine();
