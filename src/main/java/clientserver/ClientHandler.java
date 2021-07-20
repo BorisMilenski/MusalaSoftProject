@@ -31,13 +31,7 @@ public class ClientHandler extends Thread {
             Menu menu = new Menu(messageToClient);
             while (true) {
                 boolean exitFlag = false;
-//                BasicTask task1 = new BasicTask(1,"Get a cat", Priority.high);
-//                BasicTask task2 = new BasicTask(2,"Get another cat", Priority.high);
-//                BasicTask task3 = new BasicTask(3,"Get just one more cat", Priority.high);
                 List<Task> tasks = taskDAO.getTasks();
-//                tasks.add(task1);
-//                tasks.add(task2);
-//                tasks.add(task3);
                 ArrayList<Task> completed = new ArrayList<Task>();
                 ArrayList<Task> notCompleted = new ArrayList<Task>();
                 for (Task task : tasks) {
