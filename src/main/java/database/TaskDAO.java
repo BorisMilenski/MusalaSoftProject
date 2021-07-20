@@ -17,7 +17,11 @@ public class TaskDAO implements DAO {
     private static final String DB_URL = "jdbc:mysql://localhost:3306/" + DATABASE_NAME + "?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC";
 
     private Connection connection;
-    private ArrayList<Task> tasks;
+    private List<Task> tasks;
+
+    public TaskDAO() {
+        tasks = new ArrayList<>();
+    }
 
     @Override
     public List<Task> getTasks() {
