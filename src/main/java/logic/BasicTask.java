@@ -5,12 +5,20 @@ import entities.Task;
 
 import java.time.LocalDate;
 
-public class BasicTask implements Task, Cloneable{
+public class BasicTask implements Task{
     private int id;
     private String description;
-    private Priority priority; //could get changed
+    private Priority priority;
     private LocalDate entryDate;
     private LocalDate completionDate;
+
+    public BasicTask(int id, String description, Priority priority, LocalDate entryDate, LocalDate completionDate) {
+        this.id = id;
+        this.description = description;
+        this.priority = priority;
+        this.entryDate = entryDate;
+        this.completionDate = completionDate;
+    }
 
     public BasicTask(int id, String label, Priority priority) {
         this.id = id;
@@ -46,7 +54,15 @@ public class BasicTask implements Task, Cloneable{
         return this.description;
     }
 
-    public BasicTask clone(){
-        return new BasicTask(this.id, this.description,this.priority);
+    @Override
+    public LocalDate getEntryLocalDate() {
+        return this.entryDate;
     }
+
+    @Override
+    public LocalDate getCompletionLocalDate() {
+        return this.completionDate;
+    }
+
+
 }

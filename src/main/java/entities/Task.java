@@ -9,4 +9,6 @@ public interface Task{
     int getId();
     Priority getPriority();
     String getDescription();
+    LocalDate getEntryLocalDate();
+    LocalDate getCompletionLocalDate();
 }
