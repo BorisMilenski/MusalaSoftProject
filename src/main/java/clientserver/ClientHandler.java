@@ -1,5 +1,6 @@
 package clientserver;
 
+import database.TaskDAO;
 import entities.Priority;
 import entities.Task;
 import logic.BasicTask;
@@ -10,6 +11,7 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.List;
 
 public class ClientHandler extends Thread {
     final Socket socket;
@@ -21,7 +23,7 @@ public class ClientHandler extends Thread {
     @Override
     public void run() {
         String input;
-
+        TaskDAO taskDAO = TaskDAO.getInstance();
 
         try {
             BufferedReader userInputReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -29,13 +31,13 @@ public class ClientHandler extends Thread {
             Menu menu = new Menu(messageToClient);
             while (true) {
                 boolean exitFlag = false;
-                BasicTask task1 = new BasicTask(1,"Get a cat", Priority.high);
-                BasicTask task2 = new BasicTask(2,"Get another cat", Priority.high);
-                BasicTask task3 = new BasicTask(3,"Get just one more cat", Priority.high);
-                ArrayList<Task> tasks = new ArrayList<Task>();
-                tasks.add(task1);
-                tasks.add(task2);
-                tasks.add(task3);
+//                BasicTask task1 = new BasicTask(1,"Get a cat", Priority.high);
+//                BasicTask task2 = new BasicTask(2,"Get another cat", Priority.high);
+//                BasicTask task3 = new BasicTask(3,"Get just one more cat", Priority.high);
+                List<Task> tasks = taskDAO.getTasks();
+//                tasks.add(task1);
+//                tasks.add(task2);
+//                tasks.add(task3);
                 ArrayList<Task> completed = new ArrayList<Task>();
                 ArrayList<Task> notCompleted = new ArrayList<Task>();
                 for (Task task : tasks) {
@@ -67,15 +69,19 @@ public class ClientHandler extends Thread {
                 switch (input) {
                     case "1":
                         messageToClient.println("Add task here......");
+                        //todo prompt user to enter task
                         break;
                     case "2":
                         messageToClient.println("Remove task here......");
+                        //todo prompt user for id
                         break;
                     case "3":
                         messageToClient.println("Mark task as completed here......");
+                        //todo prompt user for id
                         break;
                     case "4":
                         messageToClient.println("Edit task here......");
+                        //todo prompt user for to enter task id
                         break;
                     case "exit":
                         exitFlag = true;
