@@ -14,7 +14,7 @@ public class TaskDAO implements DAO {
     private static final String TABLE_NAME = "tasks";
     private static final String DB_USERNAME = "DBM"; //TODO: Manage account
     private static final String DB_PASSWORD = "Tn65z6&dDObh@YJRRt39OwhV";//TODO: Manage account
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/" + DATABASE_NAME + "?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC";
+    private static final String DB_URL = "jdbc:mysql://localhost:3306/" + DATABASE_NAME + "?allowPublicKeyRetrieval=true&useSSL=false";
 
     private Connection connection;
     private List<Task> tasks;
@@ -76,8 +76,8 @@ public class TaskDAO implements DAO {
             System.out.println("The SQL statement is: " + strInsert); // Echo For debugging
             ResultSet set = (preparedStatement.execute()) ? preparedStatement.getResultSet() : null; //TODO: Check what to do with this result set
             System.out.println("Tasks Inserted" + "\n"); // Echo For debugging
-        } catch (SQLException exception) {
-            //TODO: Manage
+        } catch (SQLException sqlException) {
+            sqlException.printStackTrace();//TODO:Manage exception
         }finally {
             this.closeConnection();
         }
@@ -100,8 +100,8 @@ public class TaskDAO implements DAO {
             System.out.println("The SQL statement is: " + strUpdate); // Echo For debugging
             ResultSet set = (preparedStatement.execute()) ? preparedStatement.getResultSet() : null; //TODO: Check what to do with this result set
             System.out.println("Tasks updated" + "\n"); // Echo For debugging
-        } catch (SQLException exception) {
-            //TODO: manage
+        } catch (SQLException sqlException) {
+            sqlException.printStackTrace();//TODO:Manage exception
         }
         finally {
             this.closeConnection();
@@ -121,8 +121,8 @@ public class TaskDAO implements DAO {
             System.out.println("The SQL statement is: " + strDelete); // Echo For debugging
             ResultSet set = (preparedStatement.execute()) ? preparedStatement.getResultSet() : null; //TODO: Check what to do with this result set
             System.out.println("Tasks updated" + "\n"); // Echo For debugging
-        } catch (SQLException exception) {
-            //TODO: manage
+        } catch (SQLException sqlException) {
+            sqlException.printStackTrace();//TODO:Manage exception
         }
         finally {
             this.closeConnection();
