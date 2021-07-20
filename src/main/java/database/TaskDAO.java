@@ -6,6 +6,7 @@ import entities.Task;
 import logic.BasicTask;
 
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,14 +38,15 @@ public class TaskDAO implements DAO {
                 int rowCount = 0;
                 while (resultSet.next()) {
                     try {
-                        tasks.add(new BasicTask(resultSet.getInt("id"),
-                                resultSet.getString("description"),
-                                Priority.valueOf(resultSet.getString("priority")),
-                                resultSet.getTimestamp("entry_date").toLocalDateTime(),
-                                resultSet.getTimestamp("completition_date").toLocalDateTime())
-                                );
+                        int id = resultSet.getInt("id");
+                        String description = resultSet.getString("description");
+                        Priority priority =  Priority.valueOf(resultSet.getString("priority"));
+                        LocalDateTime entryDate = resultSet.getTimestamp("entry_date").toLocalDateTime();
+                        Timestamp completionTimestamp = resultSet.getTimestamp("completition_date");
+                        LocalDateTime completionDate = completionTimestamp != null ? completionTimestamp.toLocalDateTime() : null;
+                        tasks.add(new BasicTask(id, description, priority, entryDate, completionDate));
                     } catch (Exception e) {
-                        System.out.println("Database contains incorrect values"); //TODO: manage
+                        e.printStackTrace(); //TODO: manage
                     }
                     ++rowCount;
                 }
@@ -72,7 +74,7 @@ public class TaskDAO implements DAO {
             preparedStatement.setString(2, task.getDescription());
             preparedStatement.setString(3, task.getPriority().toString());
             preparedStatement.setTimestamp(4, Timestamp.valueOf(task.getEntry()));
-            preparedStatement.setTimestamp(5, Timestamp.valueOf(task.getCompletion()));
+            preparedStatement.setTimestamp(5, task.getCompletion() != null ? Timestamp.valueOf(task.getCompletion()) : null);
             System.out.println("The SQL statement is: " + strInsert); // Echo For debugging
             ResultSet set = (preparedStatement.execute()) ? preparedStatement.getResultSet() : null; //TODO: Check what to do with this result set
             System.out.println("Tasks Inserted" + "\n"); // Echo For debugging
@@ -94,7 +96,7 @@ public class TaskDAO implements DAO {
             preparedStatement.setString(1, task.getDescription());
             preparedStatement.setString(2, task.getPriority().toString());
             preparedStatement.setTimestamp(3, Timestamp.valueOf(task.getEntry()));
-            preparedStatement.setTimestamp(4, Timestamp.valueOf(task.getCompletion()));
+            preparedStatement.setTimestamp(4, task.getCompletion() != null ? Timestamp.valueOf(task.getCompletion()) : null);
             preparedStatement.setInt(5, id);
 
             System.out.println("The SQL statement is: " + strUpdate); // Echo For debugging
