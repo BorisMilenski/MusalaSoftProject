@@ -6,7 +6,7 @@ import java.time.LocalDate;
 
 public class BasicTask implements Task, Cloneable{
     private int id;
-    private String label;
+    private String description;
     private int priority; //could get changed
     private LocalDate entryDate;
     private LocalDate completionDate;
