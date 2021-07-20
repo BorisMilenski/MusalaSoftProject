@@ -1,0 +1,19 @@
+CREATE DATABASE IF NOT EXISTS tasks_data;
+
+USE tasks_data;
+
+CREATE TABLE tasks(
+id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+description VARCHAR(255) NOT NULL,
+priority ENUM('low', 'medium', 'high'),
+entry_date DATE NOT NULL,
+completition_date DATE NOT NULL
+);
+
+INSERT INTO tasks (description, priority, entry_date, completition_date)
+VALUES ('Check your email inbox', 'medium', '2021-07-20', '2021-07-24'),
+('Еnroll in a Java course', 'high', '2021-08-01', '2021-08-31'),
+('Wash the car', 'low', '2021-07-15', '2021-07-21'),
+('Go to fitness', 'medium', '2021-07-20', '2021-07-22'),
+('Clean up your house', 'high', '2021-07-18', '2021-07-22'),
+('Review Calendar for the next day', 'high', '2021-07-21', '2021-07-22');
