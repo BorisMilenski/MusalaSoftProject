@@ -26,7 +26,9 @@ public class ClientHandler extends Thread {
         try {
             BufferedReader userInputReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             PrintStream messageToClient = new PrintStream(socket.getOutputStream(),true);
+            Menu menu = new Menu(messageToClient);
             while (true) {
+                boolean exitFlag = false;
                 BasicTask task1 = new BasicTask(1,"Get a cat", Priority.high);
                 BasicTask task2 = new BasicTask(2,"Get another cat", Priority.high);
                 BasicTask task3 = new BasicTask(3,"Get just one more cat", Priority.high);
@@ -59,17 +61,32 @@ public class ClientHandler extends Thread {
                         messageToClient.println(task);
                     }
                 }
-                messageToClient.println(">>");
+                menu.printMainMenu();
                 input = userInputReader.readLine();
-                if (input.equals("exit")) {
-                    messageToClient.println("{close}");
-                    socket.close();
-                    System.out.println("[+] Client disconnected > " + socket);
-                    break;
+
+                switch (input) {
+                    case "1":
+                        messageToClient.println("Add task here......");
+                        break;
+                    case "2":
+                        messageToClient.println("Remove task here......");
+                        break;
+                    case "3":
+                        messageToClient.println("Mark task as completed here......");
+                        break;
+                    case "4":
+                        messageToClient.println("Edit task here......");
+                        break;
+                    case "exit":
+                        exitFlag = true;
+                        messageToClient.println("{close}");
+                        socket.close();
+                        System.out.println("[+] Client disconnected > " + socket);
+                        break;
+                    default:
+                        messageToClient.println("[-] Invalid option!");
                 }
-                else {
-                    messageToClient.println("not closing");
-                }
+                if (exitFlag) break;
             }
         } catch (IOException e) {
             System.out.println("[-] Error");
