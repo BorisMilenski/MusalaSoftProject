@@ -42,7 +42,7 @@ public class TaskDAO implements DAO {
                         String description = resultSet.getString("description");
                         Priority priority =  Priority.valueOf(resultSet.getString("priority"));
                         LocalDateTime entryDate = resultSet.getTimestamp("entry_date").toLocalDateTime();
-                        Timestamp completionTimestamp = resultSet.getTimestamp("completition_date");
+                        Timestamp completionTimestamp = resultSet.getTimestamp("completion_date");
                         LocalDateTime completionDate = completionTimestamp != null ? completionTimestamp.toLocalDateTime() : null;
                         tasks.add(new BasicTask(id, description, priority, entryDate, completionDate));
                     } catch (Exception e) {
@@ -66,7 +66,7 @@ public class TaskDAO implements DAO {
         try {
             this.startConnection();
 
-            String strInsert = "INSERT INTO " + DATABASE_NAME + "." + TABLE_NAME + " (id, description , priority , entry_date , completition_date)" +
+            String strInsert = "INSERT INTO " + DATABASE_NAME + "." + TABLE_NAME + " (id, description , priority , entry_date , completion_date)" +
                     " values (?, ?, ?, ?, ?)";
             PreparedStatement preparedStatement = connection.prepareStatement(strInsert);
 
@@ -90,7 +90,7 @@ public class TaskDAO implements DAO {
         try {
             this.startConnection();
 
-            String strUpdate = "UPDATE " + DATABASE_NAME + "." + TABLE_NAME + " set description = ?, priority = ?, entry_date = ?, completition_date = ? where id = ?";
+            String strUpdate = "UPDATE " + DATABASE_NAME + "." + TABLE_NAME + " set description = ?, priority = ?, entry_date = ?, completion_date = ? where id = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(strUpdate);
 
             preparedStatement.setString(1, task.getDescription());
