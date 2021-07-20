@@ -28,6 +28,12 @@ public class BasicTask implements Task{
         this.entryDate = LocalDateTime.now();
     }
 
+    public BasicTask(String label, Priority priority) {
+        this.description = label;
+        this.priority = priority;
+        this.entryDate = LocalDateTime.now();
+    }
+
     public boolean isCompleted() {
         return completionDate != null;
     }
