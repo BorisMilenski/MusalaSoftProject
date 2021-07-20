@@ -6,11 +6,10 @@ import entities.Task;
 import logic.BasicTask;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class TaskDAO implements DAO {
-
-
     private static final String DATABASE_NAME = "tasks_data";
     private static final String TABLE_NAME = "tasks";
     private static final String DB_USERNAME = "DBM"; //TODO: Manage account
@@ -18,7 +17,7 @@ public class TaskDAO implements DAO {
     private static final String DB_URL = "jdbc:mysql://localhost:3306/" + DATABASE_NAME + "?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC";
 
     private Connection connection;
-    private List<Task> tasks;
+    private ArrayList<Task> tasks;
 
     @Override
     public List<Task> getTasks() {
@@ -128,7 +127,8 @@ public class TaskDAO implements DAO {
 
     private void startConnection(){
         try {
-            Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);
+            //Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);
+            Connection conn = DriverManager.getConnection(DB_URL);
         } catch (SQLException throwables) {
             throwables.printStackTrace(); //TODO:Manage exception
         }
