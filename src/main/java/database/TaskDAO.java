@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TaskDAO implements DAO {
+    private static TaskDAO instance = new TaskDAO();
+
     private static final String DATABASE_NAME = "tasks_data";
     private static final String TABLE_NAME = "tasks";
     private static final String DB_USERNAME = "DBM"; //TODO: Manage account
@@ -20,8 +22,8 @@ public class TaskDAO implements DAO {
     private Connection connection;
     private List<Task> tasks;
 
-    public TaskDAO() {
-        tasks = new ArrayList<>();
+    public static TaskDAO getInstance(){
+        return instance;
     }
 
     @Override
@@ -66,15 +68,15 @@ public class TaskDAO implements DAO {
         try {
             this.startConnection();
 
-            String strInsert = "INSERT INTO " + DATABASE_NAME + "." + TABLE_NAME + " (id, description , priority , entry_date , completion_date)" +
-                    " values (?, ?, ?, ?, ?)";
+            String strInsert = "INSERT INTO " + DATABASE_NAME + "." + TABLE_NAME + " (description , priority , entry_date , completion_date)" +
+                    " values (?, ?, ?, ?)";
             PreparedStatement preparedStatement = connection.prepareStatement(strInsert);
 
-            preparedStatement.setInt(1, task.getId());
-            preparedStatement.setString(2, task.getDescription());
-            preparedStatement.setString(3, task.getPriority().toString());
-            preparedStatement.setTimestamp(4, Timestamp.valueOf(task.getEntry()));
-            preparedStatement.setTimestamp(5, task.getCompletion() != null ? Timestamp.valueOf(task.getCompletion()) : null);
+            //preparedStatement.setInt(1, task.getId());
+            preparedStatement.setString(1, task.getDescription());
+            preparedStatement.setString(2, task.getPriority().toString());
+            preparedStatement.setTimestamp(3, Timestamp.valueOf(task.getEntry()));
+            preparedStatement.setTimestamp(4, task.getCompletion() != null ? Timestamp.valueOf(task.getCompletion()) : null);
             System.out.println("The SQL statement is: " + strInsert); // Echo For debugging
             ResultSet set = (preparedStatement.execute()) ? preparedStatement.getResultSet() : null; //TODO: Check what to do with this result set
             System.out.println("Tasks Inserted" + "\n"); // Echo For debugging
@@ -130,6 +132,10 @@ public class TaskDAO implements DAO {
             this.closeConnection();
         }
         refreshTaskList();
+    }
+
+    private TaskDAO() {
+        tasks = new ArrayList<>();
     }
 
     private void startConnection(){
