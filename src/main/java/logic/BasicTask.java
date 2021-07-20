@@ -4,15 +4,16 @@ import entities.Priority;
 import entities.Task;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class BasicTask implements Task{
     private int id;
     private String description;
     private Priority priority;
-    private LocalDate entryDate;
-    private LocalDate completionDate;
+    private LocalDateTime entryDate;
+    private LocalDateTime completionDate;
 
-    public BasicTask(int id, String description, Priority priority, LocalDate entryDate, LocalDate completionDate) {
+    public BasicTask(int id, String description, Priority priority, LocalDateTime entryDate, LocalDateTime completionDate) {
         this.id = id;
         this.description = description;
         this.priority = priority;
@@ -24,7 +25,7 @@ public class BasicTask implements Task{
         this.id = id;
         this.description = label;
         this.priority = priority;
-        this.entryDate = LocalDate.now();
+        this.entryDate = LocalDateTime.now();
     }
 
     public boolean isCompleted() {
@@ -55,14 +56,39 @@ public class BasicTask implements Task{
     }
 
     @Override
-    public LocalDate getEntryLocalDate() {
+    public LocalDateTime getEntry() {
         return this.entryDate;
     }
 
     @Override
-    public LocalDate getCompletionLocalDate() {
+    public LocalDateTime getCompletion() {
         return this.completionDate;
     }
 
+    public void setId(int id) {
+        this.id = id;
+    }
 
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setPriority(Priority priority) {
+        this.priority = priority;
+    }
+
+    @Override
+    public void setEntry(LocalDateTime entry) {
+        this.entryDate = entry;
+    }
+
+    @Override
+    public void setCompletion(LocalDateTime completion) {
+        this.completionDate = completion;
+    }
+
+    @Override
+    public String toString() {
+        return this.getId() + ". " + this.getDescription() + " (" + this.getPriority() + ")";
+    }
 }

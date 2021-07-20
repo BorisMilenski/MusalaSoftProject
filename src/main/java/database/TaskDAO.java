@@ -29,7 +29,7 @@ public class TaskDAO implements DAO {
             try {
                 this.startConnection();
 
-                String strSelect = "SELECT * FROM" + TABLE_NAME;
+                String strSelect = "SELECT * FROM " + TABLE_NAME;
                 Statement statement = connection.createStatement();
                 System.out.println("The SQL statement is: " + strSelect); // Echo For debugging
 
@@ -40,8 +40,8 @@ public class TaskDAO implements DAO {
                         tasks.add(new BasicTask(resultSet.getInt("id"),
                                 resultSet.getString("description"),
                                 Priority.valueOf(resultSet.getString("priority")),
-                                resultSet.getTimestamp("entry_date").toLocalDateTime().toLocalDate(),
-                                resultSet.getTimestamp("completition_date").toLocalDateTime().toLocalDate())
+                                resultSet.getTimestamp("entry_date").toLocalDateTime(),
+                                resultSet.getTimestamp("completition_date").toLocalDateTime())
                                 );
                     } catch (Exception e) {
                         System.out.println("Database contains incorrect values"); //TODO: manage
@@ -50,7 +50,7 @@ public class TaskDAO implements DAO {
                 }
                 System.out.println("Total number of records = " + rowCount + "\n");
             } catch (SQLException sqlException) {
-                //TODO:deal with it
+                sqlException.printStackTrace();//TODO:deal with it
             }
             finally {
                 this.closeConnection();
@@ -71,8 +71,8 @@ public class TaskDAO implements DAO {
             preparedStatement.setInt(1, task.getId());
             preparedStatement.setString(2, task.getDescription());
             preparedStatement.setString(3, task.getPriority().toString());
-            preparedStatement.setTimestamp(4, Timestamp.valueOf(task.getEntryLocalDate().atStartOfDay()));
-            preparedStatement.setTimestamp(5, Timestamp.valueOf(task.getCompletionLocalDate().atStartOfDay()));
+            preparedStatement.setTimestamp(4, Timestamp.valueOf(task.getEntry()));
+            preparedStatement.setTimestamp(5, Timestamp.valueOf(task.getCompletion()));
             System.out.println("The SQL statement is: " + strInsert); // Echo For debugging
             ResultSet set = (preparedStatement.execute()) ? preparedStatement.getResultSet() : null; //TODO: Check what to do with this result set
             System.out.println("Tasks Inserted" + "\n"); // Echo For debugging
@@ -81,6 +81,7 @@ public class TaskDAO implements DAO {
         }finally {
             this.closeConnection();
         }
+        refreshTaskList();
     }
     @Override
     public void editTask(int id, Task task) {
@@ -92,8 +93,8 @@ public class TaskDAO implements DAO {
 
             preparedStatement.setString(1, task.getDescription());
             preparedStatement.setString(2, task.getPriority().toString());
-            preparedStatement.setTimestamp(3, Timestamp.valueOf(task.getEntryLocalDate().atStartOfDay()));
-            preparedStatement.setTimestamp(4, Timestamp.valueOf(task.getCompletionLocalDate().atStartOfDay()));
+            preparedStatement.setTimestamp(3, Timestamp.valueOf(task.getEntry()));
+            preparedStatement.setTimestamp(4, Timestamp.valueOf(task.getCompletion()));
             preparedStatement.setInt(5, id);
 
             System.out.println("The SQL statement is: " + strUpdate); // Echo For debugging
@@ -105,8 +106,8 @@ public class TaskDAO implements DAO {
         finally {
             this.closeConnection();
         }
+        refreshTaskList();
     }
-
     @Override
     public void removeTask(int id, Task task) {
         try {
@@ -126,15 +127,15 @@ public class TaskDAO implements DAO {
         finally {
             this.closeConnection();
         }
+        refreshTaskList();
     }
-
 
     private void startConnection(){
         try {
-            //Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);
-            Connection conn = DriverManager.getConnection(DB_URL);
-        } catch (SQLException throwables) {
-            throwables.printStackTrace(); //TODO:Manage exception
+            connection = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);
+            //connection = DriverManager.getConnection(DB_URL);
+        } catch (SQLException sqlException) {
+           sqlException.printStackTrace();//TODO:Manage exception
         }
         finally {
             System.out.print("Connected to database"); //TODO: Do this with a Logger
@@ -146,8 +147,11 @@ public class TaskDAO implements DAO {
             if (!connection.isClosed()) {
                 connection.close();
             }
-        } catch (SQLException throwables) {
-            throwables.printStackTrace(); //TODO:Manage exception
+        } catch (SQLException sqlException) { sqlException.printStackTrace();//TODO:Manage exception
         }
+    }
+
+    private void refreshTaskList(){
+        this.tasks.clear();
     }
 }

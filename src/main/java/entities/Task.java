@@ -1,6 +1,7 @@
 package entities;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public interface Task{
     boolean isCompleted();
@@ -9,6 +10,12 @@ public interface Task{
     int getId();
     Priority getPriority();
     String getDescription();
-    LocalDate getEntryLocalDate();
-    LocalDate getCompletionLocalDate();
+    LocalDateTime getEntry();
+    LocalDateTime getCompletion();
+    void setId(int id);
+    void setDescription(String description);
+    void setPriority(Priority priority);
+    void setEntry(LocalDateTime entry);
+    void setCompletion(LocalDateTime completion);
+
 }
