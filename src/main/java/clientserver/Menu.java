@@ -60,4 +60,53 @@ public class Menu {
         }
         return new BasicTask(description,priorityEnum);
     }
+
+    public String taskIDPrompt() throws IOException {
+        messageToClient.println("Enter task ID:");
+        messageToClient.println(">>");
+        return userInputReader.readLine();
+    }
+
+    public Task editTaskPrompt(Task task) throws IOException {
+        while (true) {
+            messageToClient.println("Edit:\n" +
+                    "{1} Description\n" +
+                    "{2} Priority\n" +
+                    "{3} Save");
+            messageToClient.println(">>");
+            String input = userInputReader.readLine();
+            switch (input) {
+                case "1":
+                    messageToClient.println("Enter new description:");
+                    messageToClient.println(">>");
+                    input = userInputReader.readLine();
+                    task.setDescription(input);
+                    break;
+                case "2":
+                    messageToClient.println("Enter new priority:");
+                    messageToClient.println(">>");
+                    input = userInputReader.readLine();
+                    switch (input) {
+                        case "low":
+                            task.setPriority(Priority.low);
+                            break;
+                        case "medium":
+                            task.setPriority(Priority.medium);
+                            break;
+                        case "high":
+                            task.setPriority(Priority.high);
+                            break;
+                        default:
+                            messageToClient.println("[-] Invalid priority!");
+                    }
+                    break;
+                case "3":
+                    return task;
+                default:
+                    messageToClient.println("[-] Invalid option!");
+            }
+        }
+
+
+    }
 }
