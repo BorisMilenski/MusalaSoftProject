@@ -81,7 +81,7 @@ public class TaskDAO extends DatabaseAccess implements DAO<Task> {
         if (doesIdExistInList(id)) {
             this.startConnection();
 
-            String strUpdate = "UPDATE " + DATABASE_NAME + "." + TABLE_NAME + " set description = ?, priority = ?, entry_date = ?, completion_date = ?, user_id where id = ?";
+            String strUpdate = "UPDATE " + DATABASE_NAME + "." + TABLE_NAME + " set description = ?, priority = ?, entry_date = ?, completion_date = ?, user_id = ? where id = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(strUpdate);
 
             preparedStatement.setString(1, t.getDescription());
