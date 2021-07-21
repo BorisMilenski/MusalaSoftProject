@@ -4,7 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public abstract class DatabaseDAO{
+public abstract class DatabaseAccess {
     protected static final String DATABASE_NAME = "tasks_data";
     protected static final String DB_USERNAME = "DBM";
     protected static final String DB_PASSWORD = "Tn65z6&dDObh@YJRRt39OwhV";

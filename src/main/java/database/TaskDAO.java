@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TaskDAO extends DatabaseDAO implements DAO<Task> {
+public class TaskDAO extends DatabaseAccess implements DAO<Task> {
     private static final String TABLE_NAME = "tasks";
 
     private final User user;

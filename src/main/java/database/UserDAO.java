@@ -7,7 +7,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserDAO extends DatabaseDAO implements DAO<User> {
+public class UserDAO extends DatabaseAccess implements DAO<User> {
 
     private static final String TABLE_NAME = "users";
     private User user;
