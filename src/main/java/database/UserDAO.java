@@ -18,13 +18,15 @@ public class UserDAO extends DatabaseAccess implements DAO<User> {
 
     public UserDAO() {}
 
-    public UserDAO(String username, String password) throws SQLException {
+    public void initialize(String username, String password){
         this.username = username;
         this.password = password;
-        this.user = this.get().get(0);
     }
 
-    public User getUser() {
+    public User getUser() throws SQLException {
+        if (user == null){
+            user = this.get().get(0);
+        }
         return user;
     }
 
@@ -48,7 +50,7 @@ public class UserDAO extends DatabaseAccess implements DAO<User> {
                     String username = resultSet.getString("username");
                     String password = resultSet.getString("password");
                     String email = resultSet.getString("email");
-                    users.add(new User(id, username, password, email));
+                    users.add(new User.UserBuilder(username, password).withId(id).withEmail(email).build());
                 }
             }
             this.closeConnection();
@@ -64,11 +66,10 @@ public class UserDAO extends DatabaseAccess implements DAO<User> {
 
     @Override
     synchronized public void add(User t) throws SQLException {
-        System.out.println("entered add");
-        this.startConnection();
+
 
         if (!getAllUsernames().contains(t.getUsername())) {
-
+            this.startConnection();
             String strInsert = "INSERT INTO " + DATABASE_NAME + "." + TABLE_NAME + " (username, password, email)" +
                     " values (?, ?, ?)";
             PreparedStatement preparedStatement = connection.prepareStatement(strInsert);
@@ -81,16 +82,13 @@ public class UserDAO extends DatabaseAccess implements DAO<User> {
             System.out.println("[+] User Inserted" + "\n"); // Echo For debugging
 
             this.closeConnection();
-            this.username=t.getUsername();
-            this.password=t.getPassword();
-            this.user=this.get().get(0);
         }
         else{
             throw new SQLDataException("[-] Username already taken");
         }
     }
 
-    synchronized private HashSet<String> getAllUsernames() throws SQLException {
+    synchronized public HashSet<String> getAllUsernames() throws SQLException {
         HashSet<String> usernames = new HashSet<>();
 
         this.startConnection();
@@ -102,22 +100,21 @@ public class UserDAO extends DatabaseAccess implements DAO<User> {
         ResultSet resultSet = (preparedStatement.execute()) ? preparedStatement.getResultSet() : null;
         if (resultSet != null) {
             while (resultSet.next()) {
-                //int id = resultSet.getInt("id");
                 String username = resultSet.getString("username");
                 usernames.add(username);
             }
         }
-        //this.closeConnection();
+        this.closeConnection();
         return usernames;
     }
     //TODO: Remove placeholders
     @Override
-    synchronized public void edit(int id, User user) throws SQLException, IllegalArgumentException {
+    synchronized public void edit(int id, User user) {
 
     }
 
     @Override
-    synchronized public void remove(int id) throws SQLException, IllegalArgumentException {
+    synchronized public void remove(int id) {
 
     }
     /*@Override TODO: Check if we need these ones and add extra checks (does user exist)

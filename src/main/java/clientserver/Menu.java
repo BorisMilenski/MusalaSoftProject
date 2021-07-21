@@ -14,6 +14,7 @@ import java.util.List;
 public class Menu {
     private PrintStream messageToClient;
     private BufferedReader userInputReader;
+    private boolean newAccount = false;
 
     public Menu (PrintStream messageToClient, BufferedReader userInputReader) {
         this.messageToClient = messageToClient;
@@ -33,8 +34,7 @@ public class Menu {
     public Task addTaskPrompt() throws IOException {
         String description;
         String priority;
-        Priority priorityEnum = null;
-        boolean priorityIsSet = false;
+        Priority actualPriority = null;
         messageToClient.println("Set task description:");
         messageToClient.println(">>");
         description = userInputReader.readLine();
@@ -42,26 +42,14 @@ public class Menu {
             messageToClient.println("Set task priority (low/medium/high):");
             messageToClient.println(">>");
             priority = userInputReader.readLine();
-            switch (priority) {
-                case "low":
-                    priorityEnum = Priority.low;
-                    priorityIsSet = true;
-                    break;
-                case "medium":
-                    priorityEnum = Priority.medium;
-                    priorityIsSet = true;
-                    break;
-                case "high":
-                    priorityEnum = Priority.high;
-                    priorityIsSet = true;
-                    break;
-                default:
-                    messageToClient.println("[-] Invalid priority value!");
-                    break;
+            try {
+                actualPriority = Priority.valueOf(priority.toLowerCase());
+            }catch (IllegalArgumentException i){
+                messageToClient.println("[-] Invalid priority!");
             }
-            if (priorityIsSet) break;
+            if (actualPriority != null) break;
         }
-        return new BasicTask(description,priorityEnum);
+        return new BasicTask(description, actualPriority);
     }
 
     public String taskIDPrompt() throws IOException {
@@ -89,18 +77,10 @@ public class Menu {
                     messageToClient.println("Enter new priority:");
                     messageToClient.println(">>");
                     input = userInputReader.readLine();
-                    switch (input) {
-                        case "low":
-                            task.setPriority(Priority.low);
-                            break;
-                        case "medium":
-                            task.setPriority(Priority.medium);
-                            break;
-                        case "high":
-                            task.setPriority(Priority.high);
-                            break;
-                        default:
-                            messageToClient.println("[-] Invalid priority!");
+                    try {
+                        task.setPriority(Priority.valueOf(input.toLowerCase()));
+                    }catch (IllegalArgumentException i){
+                        messageToClient.println("[-] Invalid priority!");
                     }
                     break;
                 case "3":
@@ -124,6 +104,7 @@ public class Menu {
                 case "1":
                     return login();
                 case "2":
+                    newAccount = true;
                     return register();
                 default:
                     messageToClient.println("[-] Invalid option!");
@@ -133,19 +114,20 @@ public class Menu {
 
     }
 
+    public boolean isNewAccount(){
+        return newAccount;
+    }
+
     private User login() throws IOException {
         String username;
         String password;
-        //ArrayList<String> userpass = new ArrayList<>();
         messageToClient.println("Username:");
         messageToClient.println(">>");
         username = userInputReader.readLine();
         messageToClient.println("Password:");
         messageToClient.println(">>");
         password = userInputReader.readLine();
-        //userpass.add(username);
-        //userpass.add(password);
-        return new User(username,password);
+        return new User.UserBuilder(username,password).build();
     }
 
     private User register() throws IOException {
@@ -161,7 +143,7 @@ public class Menu {
         messageToClient.println("Email:");
         messageToClient.println(">>");
         email = userInputReader.readLine();
-        return new User(username, password, email);
+        return new User.UserBuilder(username, password).withEmail(email).build();
     }
 
 }

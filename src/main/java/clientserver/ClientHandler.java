@@ -13,14 +13,12 @@ import java.io.PrintStream;
 import java.net.Socket;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.TreeMap;
 
 public class ClientHandler extends Thread {
-    final Socket socket;
-    User currentUser = null;
+    private final Socket socket;
+    private User currentUser = null;
+    private boolean isRunning = true;
 
     public ClientHandler(Socket socket) {
         this.socket = socket;
@@ -34,23 +32,19 @@ public class ClientHandler extends Thread {
             BufferedReader userInputReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             PrintStream messageToClient = new PrintStream(socket.getOutputStream(),true);
             Menu menu = new Menu(messageToClient, userInputReader);
-            while (true) {
-                UserDAO userDAO = null;
+            while (isRunning) {
+                UserDAO userDAO = new UserDAO();
                 try {
                     if (currentUser == null) {
-                        User someUser = menu.loginPrompt();
-                        if (someUser.getId()==-1) {
-                            userDAO = new UserDAO(someUser.getUsername(), someUser.getPassword());
-                            currentUser = userDAO.getUser();
+                        currentUser = menu.loginPrompt();
+                        if (menu.isNewAccount()) {
+                            userDAO.add(currentUser);
                         }
-                        if (someUser.getId()==-2) {
-                            userDAO = new UserDAO();
-                            userDAO.add(someUser);
-                            currentUser = userDAO.getUser();
-                        }
+                        userDAO.initialize(currentUser.getUsername(), currentUser.getPassword());
+                        currentUser = userDAO.getUser();
                     }
                     TaskDAO taskDAO = new TaskDAO(currentUser);
-                    boolean exitFlag = false;
+
                     TreeMap<Integer,Task> completed = new TreeMap<>();
                     TreeMap<Integer,Task> notCompleted = new TreeMap<>();
                     int taskCounter = 1;
@@ -136,7 +130,7 @@ public class ClientHandler extends Thread {
                             }
                             break;
                         case "exit":
-                            exitFlag = true;
+                            isRunning = false;
                             messageToClient.println("{close}");
                             socket.close();
                             System.out.println("[+] Client disconnected > " + socket);
@@ -144,10 +138,7 @@ public class ClientHandler extends Thread {
                         default:
                             messageToClient.println("[-] Invalid option!");
                     }
-                    if (exitFlag) break;
-                } catch (SQLException s) {
-                    messageToClient.println(s.getMessage());
-                } catch (IllegalArgumentException e) {
+                } catch (Exception e) {
                     messageToClient.println(e.getMessage());
                 }
             }
@@ -156,10 +147,5 @@ public class ClientHandler extends Thread {
             e.printStackTrace();
         }
 
-    }
-
-    private int getRealTaskID (List<Task> tasks, String displayID) throws IndexOutOfBoundsException, NumberFormatException {
-        Task task = tasks.get(Integer.parseInt(displayID)-1);
-        return task.getId();
     }
 }

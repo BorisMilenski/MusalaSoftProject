@@ -21,13 +21,6 @@ public class BasicTask implements Task{
         this.completionDate = completionDate;
     }
 
-    public BasicTask(int id, String label, Priority priority) {
-        this.id = id;
-        this.description = label;
-        this.priority = priority;
-        this.entryDate = LocalDateTime.now();
-    }
-
     public BasicTask(String label, Priority priority) {
         this.description = label;
         this.priority = priority;
@@ -128,13 +121,13 @@ public class BasicTask implements Task{
         for (int i = 0; i < diff.length; i++){
             if (diff[i] != 0){
                 if (!result.equals("")){
-                    result.concat(", ") ;
+                    result = result.concat(", ") ;
                 }
-                result += labels[i];
+                result = result.concat(labels[i]);
                 if (diff[i] > 1){
-                    result.concat("s");
+                    result = result.concat("s");
                 }
-                result.concat(" " + diff[i]);
+                result = result.concat(" " + diff[i]);
             }
         }
         if (result.equals("")){

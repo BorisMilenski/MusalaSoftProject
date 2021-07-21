@@ -6,27 +6,6 @@ public class User {
     private String password;
     private String email;
 
-    public User(int id, String username, String password, String email) {
-        this.id = id;
-        this.username = username;
-        this.password = password;
-        this.email = email;
-    }
-
-    public User(String username, String password, String email) {
-        this.id = -2;
-        this.username = username;
-        this.password = password;
-        this.email = email;
-    }
-
-    public User(String username, String password) {
-        this.id = -1;
-        this.username = username;
-        this.password = password;
-        this.email = "";
-    }
-
     public int getId() {
         return id;
     }
@@ -58,4 +37,37 @@ public class User {
     public void setEmail(String email) {
         this.email = email;
     }
+
+    public static class UserBuilder{
+        private int id;
+        private String username;
+        private String password;
+        private String email;
+
+        public UserBuilder(String username, String password) {
+            this.username = username;
+            this.password = password;
+        }
+
+        public UserBuilder withId(int id){
+            this.id = id;
+            return this;
+        }
+
+        public UserBuilder withEmail(String email){
+            this.email = email;
+            return this;
+        }
+
+        public User build(){
+            User user = new User();
+            user.id = this.id;
+            user.username = this.username;
+            user.password = this.password;
+            user.email = this.email;
+            return user;
+        }
+    }
+
+    private User() {}
 }
