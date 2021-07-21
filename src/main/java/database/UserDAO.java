@@ -75,12 +75,15 @@ public class UserDAO extends DatabaseAccess implements DAO<User> {
 
             preparedStatement.setString(1, t.getUsername());
             preparedStatement.setString(2, t.getPassword());
-            preparedStatement.setString(2, t.getEmail());
+            preparedStatement.setString(3, t.getEmail());
             System.out.println("[+] The SQL statement is: " + strInsert); // Echo For debugging
             ResultSet resultSet = (preparedStatement.execute()) ? preparedStatement.getResultSet() : null;
             System.out.println("[+] User Inserted" + "\n"); // Echo For debugging
 
             this.closeConnection();
+            this.username=t.getUsername();
+            this.password=t.getPassword();
+            this.user=this.get().get(0);
         }
         else{
             throw new SQLDataException("[-] Username already taken");
@@ -99,12 +102,12 @@ public class UserDAO extends DatabaseAccess implements DAO<User> {
         ResultSet resultSet = (preparedStatement.execute()) ? preparedStatement.getResultSet() : null;
         if (resultSet != null) {
             while (resultSet.next()) {
-                int id = resultSet.getInt("id");
+                //int id = resultSet.getInt("id");
                 String username = resultSet.getString("username");
                 usernames.add(username);
             }
         }
-        this.closeConnection();
+        //this.closeConnection();
         return usernames;
     }
     //TODO: Remove placeholders
