@@ -3,8 +3,8 @@ package logic;
 import entities.Priority;
 import entities.Task;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 public class BasicTask implements Task{
     private int id;
@@ -38,12 +38,12 @@ public class BasicTask implements Task{
         return completionDate != null;
     }
 
-    public int completionTimeFromSet() {
-        return 0;
+    public String completionTimeFromSet() {
+        return timeDiffToString(compareLocalDateTime(entryDate, completionDate));
     }
 
-    public int completionTimeFromCustom(LocalDate date) {
-        return 0;
+    public String completionTimeFromCustom(LocalDateTime date) {
+        return timeDiffToString(compareLocalDateTime(date, completionDate));
     }
 
     @Override
@@ -95,6 +95,51 @@ public class BasicTask implements Task{
 
     @Override
     public String toString() {
-        return this.getId() + ". " + this.getDescription() + " (" + this.getPriority() + ")";
+        return this.getDescription() + " (" + this.getPriority() + ")";
+    }
+
+    private long[] compareLocalDateTime(LocalDateTime fromDateTime, LocalDateTime toDateTime){
+        long[] diff = new long[6];
+        LocalDateTime tempDateTime = LocalDateTime.from( fromDateTime );
+
+        diff[0] = tempDateTime.until( toDateTime, ChronoUnit.YEARS );
+        tempDateTime = tempDateTime.plusYears( diff[0] );
+
+        diff[1] = tempDateTime.until( toDateTime, ChronoUnit.MONTHS );
+        tempDateTime = tempDateTime.plusMonths( diff[1] );
+
+        diff[2] = tempDateTime.until( toDateTime, ChronoUnit.DAYS );
+        tempDateTime = tempDateTime.plusDays(diff[2]);
+
+        diff[3] = tempDateTime.until( toDateTime, ChronoUnit.HOURS );
+        tempDateTime = tempDateTime.plusHours(diff[3]);
+
+        diff[4] = tempDateTime.until( toDateTime, ChronoUnit.MINUTES );
+        tempDateTime = tempDateTime.plusMinutes( diff[4] );
+
+        diff[5] = tempDateTime.until( toDateTime, ChronoUnit.SECONDS );
+
+        return diff;
+    }
+
+    private String timeDiffToString(long[] diff){
+        String result = "";
+        String[] labels = new String[]{"year", "month", "day", "hour", "minute", "second"};
+        for (int i = 0; i < diff.length; i++){
+            if (diff[i] != 0){
+                if (!result.equals("")){
+                    result.concat(", ") ;
+                }
+                result += labels[i];
+                if (diff[i] > 1){
+                    result.concat("s");
+                }
+                result.concat(" " + diff[i]);
+            }
+        }
+        if (result.equals("")){
+            result = "The dates are the same";
+        }
+        return result;
     }
 }
