@@ -95,7 +95,7 @@ public class BasicTask implements Task{
 
     @Override
     public String toString() {
-        return this.getId() + ". " + this.getDescription() + " (" + this.getPriority() + ")";
+        return this.getDescription() + " (" + this.getPriority() + ")";
     }
 
     private long[] compareLocalDateTime(LocalDateTime fromDateTime, LocalDateTime toDateTime){
@@ -128,13 +128,13 @@ public class BasicTask implements Task{
         for (int i = 0; i < diff.length; i++){
             if (diff[i] != 0){
                 if (!result.equals("")){
-                    result += ", ";
+                    result.concat(", ") ;
                 }
                 result += labels[i];
                 if (diff[i] > 1){
-                    result += "s";
+                    result.concat("s");
                 }
-                result += " " + diff[i];
+                result.concat(" " + diff[i]);
             }
         }
         if (result.equals("")){

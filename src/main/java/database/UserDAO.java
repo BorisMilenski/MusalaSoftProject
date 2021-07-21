@@ -5,6 +5,7 @@ import entities.User;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public class UserDAO extends DatabaseAccess implements DAO<User> {
@@ -18,9 +19,6 @@ public class UserDAO extends DatabaseAccess implements DAO<User> {
         this.username = username;
         this.password = password;
         this.user = this.get().get(0);
-    }
-
-    public UserDAO() {
     }
 
     public User getUser() {
@@ -53,10 +51,10 @@ public class UserDAO extends DatabaseAccess implements DAO<User> {
             this.closeConnection();
         }
         if (users.isEmpty()){
-            throw new SQLDataException("No user found");
+            throw new SQLDataException("[-] No user found");
         }
         if (users.size() > 1){
-            throw new SQLDataException("Multiple users found");
+            throw new SQLDataException("[-] Multiple users found");
         }
         return users;
     }
@@ -65,18 +63,45 @@ public class UserDAO extends DatabaseAccess implements DAO<User> {
     synchronized public void add(User t) throws SQLException {
         this.startConnection();
 
-        String strInsert = "INSERT INTO " + DATABASE_NAME + "." + TABLE_NAME + " (username, password, email)" +
-                " values (?, ?, ?)";
-        PreparedStatement preparedStatement = connection.prepareStatement(strInsert);
+        if (!getAllUsernames().contains(t.getUsername())) {
 
-        preparedStatement.setString(1, t.getUsername());
-        preparedStatement.setString(2, t.getPassword());
-        preparedStatement.setString(2, t.getEmail());
-        System.out.println("[+] The SQL statement is: " + strInsert); // Echo For debugging
+            String strInsert = "INSERT INTO " + DATABASE_NAME + "." + TABLE_NAME + " (username, password, email)" +
+                    " values (?, ?, ?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(strInsert);
+
+            preparedStatement.setString(1, t.getUsername());
+            preparedStatement.setString(2, t.getPassword());
+            preparedStatement.setString(2, t.getEmail());
+            System.out.println("[+] The SQL statement is: " + strInsert); // Echo For debugging
+            ResultSet resultSet = (preparedStatement.execute()) ? preparedStatement.getResultSet() : null;
+            System.out.println("[+] User Inserted" + "\n"); // Echo For debugging
+
+            this.closeConnection();
+        }
+        else{
+            throw new SQLDataException("[-] Username already taken");
+        }
+    }
+
+    synchronized private HashSet<String> getAllUsernames() throws SQLException {
+        HashSet<String> usernames = new HashSet<>();
+
+        this.startConnection();
+
+        String strSelect = "SELECT username FROM " + TABLE_NAME;
+        PreparedStatement preparedStatement = connection.prepareStatement(strSelect);
+        System.out.println("[+] The SQL statement is: " + strSelect); // Echo For debugging
+
         ResultSet resultSet = (preparedStatement.execute()) ? preparedStatement.getResultSet() : null;
-        System.out.println("[+] User Inserted" + "\n"); // Echo For debugging
-
+        if (resultSet != null) {
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                String username = resultSet.getString("username");
+                usernames.add(username);
+            }
+        }
         this.closeConnection();
+        return usernames;
     }
     //TODO: Remove placeholders
     @Override

@@ -50,7 +50,7 @@ public class TaskDAO extends DatabaseAccess implements DAO<Task> {
             this.closeConnection();
         }
         if (tasks.isEmpty()){
-            throw new SQLDataException("User Id not found or no Task data Found");
+            throw new SQLDataException("[-] User Id not found or no Task data Found");
         }
         return tasks;
     }
@@ -98,7 +98,7 @@ public class TaskDAO extends DatabaseAccess implements DAO<Task> {
             this.closeConnection();
             refreshTaskList();
         }else {
-            throw new IllegalArgumentException("Task Id not found");
+            throw new IllegalArgumentException("[-] Task Id not found");
         }
     }
     @Override
@@ -118,7 +118,7 @@ public class TaskDAO extends DatabaseAccess implements DAO<Task> {
             this.closeConnection();
             refreshTaskList();
         }else{
-            throw new IllegalArgumentException("Task Id not found");
+            throw new IllegalArgumentException("[-] Task Id not found");
         }
     }
 
@@ -141,10 +141,10 @@ public class TaskDAO extends DatabaseAccess implements DAO<Task> {
                 refreshTaskList();
             }
             else{
-                throw new IllegalArgumentException("Task Id not found");
+                throw new IllegalArgumentException("[-] Task Id not found");
             }
         }else{
-            throw new IllegalArgumentException("completion_date cannot be null");
+            throw new IllegalArgumentException("[-] completion_date cannot be null");
         }
     }
 

@@ -1,9 +1,9 @@
 package clientserver;
 
 import database.TaskDAO;
-import entities.Priority;
+import database.UserDAO;
 import entities.Task;
-import logic.BasicTask;
+import entities.User;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -25,7 +25,6 @@ public class ClientHandler extends Thread {
     @Override
     public void run() {
         String input;
-        TaskDAO taskDAO = TaskDAO.getInstance();
 
         try {
             BufferedReader userInputReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -33,10 +32,13 @@ public class ClientHandler extends Thread {
             Menu menu = new Menu(messageToClient, userInputReader);
             while (true) {
                 try {
+                    User testUser = new User(1, "ivan31", "qw12asE4", "ivan_petrov@gmail.com");//TODO: Use constructor with user
+                    UserDAO userDAO = new UserDAO(testUser.getUsername(), testUser.getPassword());
+                    TaskDAO taskDAO = new TaskDAO(userDAO.getUser());
                     boolean exitFlag = false;
-                    List<Task> tasks = taskDAO.getTasks();
-                    ArrayList<Task> completed = new ArrayList<Task>();
-                    ArrayList<Task> notCompleted = new ArrayList<Task>();
+                    List<Task> tasks = taskDAO.get();
+                    ArrayList<Task> completed = new ArrayList<>();
+                    ArrayList<Task> notCompleted = new ArrayList<>();
                     int taskCounter = 1;
                     for (Task task : tasks) {
                         if (task.isCompleted()) {
@@ -73,14 +75,14 @@ public class ClientHandler extends Thread {
                     switch (input) {
                         case "1":
                             Task task = menu.addTaskPrompt();
-                            taskDAO.addTask(task);
+                            taskDAO.add(task);
                             messageToClient.println("[+] Task added successfully!");
                             break;
                         case "2":
                             try {
                                 String taskDisplayID = menu.taskIDPrompt();
                                 int taskID = getRealTaskID(tasks,taskDisplayID);
-                                taskDAO.removeTask(taskID);
+                                taskDAO.remove(taskID);
                                 messageToClient.println("[+] Task removed successfully!");
                             } catch (IndexOutOfBoundsException e) {
                                 messageToClient.println("[-] Invalid task ID!");
@@ -92,7 +94,7 @@ public class ClientHandler extends Thread {
                             try {
                                 String taskDisplayID = menu.taskIDPrompt();
                                 int taskID = getRealTaskID(tasks,taskDisplayID);
-                                taskDAO.markTaskasCompleted(taskID, LocalDateTime.now());
+                                taskDAO.markTaskAsCompleted(taskID, LocalDateTime.now());
                                 messageToClient.println("[+] Task marked as completed!");
                             } catch (IndexOutOfBoundsException e) {
                                 messageToClient.println("[-] Invalid task ID!");
@@ -106,7 +108,7 @@ public class ClientHandler extends Thread {
                                 int taskID=getRealTaskID(tasks,taskDisplayID);
                                 Task editedTask = menu.editTaskPrompt(tasks.get(Integer.parseInt(taskDisplayID)-1));
                                 messageToClient.println("editedTask id is: " + editedTask.getId());
-                                taskDAO.editTask(taskID,editedTask);
+                                taskDAO.edit(taskID,editedTask);
                             } catch (IndexOutOfBoundsException e) {
                                 messageToClient.println("[-] Invalid task ID!");
                             } catch (NumberFormatException e) {
@@ -124,9 +126,9 @@ public class ClientHandler extends Thread {
                     }
                     if (exitFlag) break;
                 } catch (SQLException s) {
-                    messageToClient.println("[-] Error connecting to database!");
+                    messageToClient.println(s.getMessage());
                 } catch (IllegalArgumentException e) {
-                    messageToClient.println("[-] Invalid task ID!");
+                    messageToClient.println(e.getMessage());
                 }
             }
         } catch (IOException e) {
