@@ -28,12 +28,13 @@ public class ClientHandler extends Thread {
         try {
             BufferedReader userInputReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             PrintStream messageToClient = new PrintStream(socket.getOutputStream(),true);
-            Menu menu = new Menu(messageToClient);
+            Menu menu = new Menu(messageToClient, userInputReader);
             while (true) {
                 boolean exitFlag = false;
                 List<Task> tasks = taskDAO.getTasks();
                 ArrayList<Task> completed = new ArrayList<Task>();
                 ArrayList<Task> notCompleted = new ArrayList<Task>();
+                int taskCounter = 1;
                 for (Task task : tasks) {
                     if (task.isCompleted()) {
                         completed.add(task);
@@ -46,7 +47,8 @@ public class ClientHandler extends Thread {
                     messageToClient.println("None");
                 } else {
                     for (Task task : completed) {
-                        messageToClient.println(task);
+                        messageToClient.println(taskCounter + ". " + task);
+                        taskCounter++;
                     }
                 }
                 messageToClient.println("[*] Remaining tasks:");
@@ -54,7 +56,8 @@ public class ClientHandler extends Thread {
                     messageToClient.println("None");
                 } else {
                     for (Task task : notCompleted) {
-                        messageToClient.println(task);
+                        messageToClient.println(taskCounter + ". " + task);
+                        taskCounter++;
                     }
                 }
                 menu.printMainMenu();
@@ -62,8 +65,9 @@ public class ClientHandler extends Thread {
 
                 switch (input) {
                     case "1":
-                        messageToClient.println("Add task here......");
-                        //todo prompt user to enter task
+                        Task task = menu.addTaskPrompt();
+                        taskDAO.addTask(task);
+                        messageToClient.println("[+] Task added successfully!");
                         break;
                     case "2":
                         messageToClient.println("Remove task here......");
@@ -93,5 +97,10 @@ public class ClientHandler extends Thread {
             e.printStackTrace();
         }
 
+    }
+
+    private int getRealTaskID (List<Task> tasks, String displayID) throws IndexOutOfBoundsException, NumberFormatException {
+        Task task = tasks.get(Integer.parseInt(displayID)-1);
+        return task.getId();
     }
 }
