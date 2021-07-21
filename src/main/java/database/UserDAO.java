@@ -20,6 +20,9 @@ public class UserDAO extends DatabaseAccess implements DAO<User> {
         this.user = this.get().get(0);
     }
 
+    public User getUser() {
+        return user;
+    }
 
     @Override
     synchronized public List<User> get() throws SQLException {
@@ -27,7 +30,7 @@ public class UserDAO extends DatabaseAccess implements DAO<User> {
         if (user == null) {
             this.startConnection();
 
-            String strSelect = "SELECT * FROM " + TABLE_NAME + "where username = ? and password = ?";
+            String strSelect = "SELECT * FROM " + TABLE_NAME + " where username = ? and password = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(strSelect);
             System.out.println("[+] The SQL statement is: " + strSelect); // Echo For debugging
 
