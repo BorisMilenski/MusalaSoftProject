@@ -20,6 +20,9 @@ public class UserDAO extends DatabaseAccess implements DAO<User> {
         this.user = this.get().get(0);
     }
 
+    public UserDAO() {
+    }
+
     public User getUser() {
         return user;
     }
@@ -66,9 +69,9 @@ public class UserDAO extends DatabaseAccess implements DAO<User> {
                 " values (?, ?, ?)";
         PreparedStatement preparedStatement = connection.prepareStatement(strInsert);
 
-        preparedStatement.setString(1, user.getUsername());
-        preparedStatement.setString(2, user.getPassword());
-        preparedStatement.setString(2, user.getEmail());
+        preparedStatement.setString(1, t.getUsername());
+        preparedStatement.setString(2, t.getPassword());
+        preparedStatement.setString(2, t.getEmail());
         System.out.println("[+] The SQL statement is: " + strInsert); // Echo For debugging
         ResultSet resultSet = (preparedStatement.execute()) ? preparedStatement.getResultSet() : null;
         System.out.println("[+] User Inserted" + "\n"); // Echo For debugging
