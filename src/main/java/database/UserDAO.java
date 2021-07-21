@@ -20,7 +20,7 @@ public class UserDAO extends DatabaseAccess implements DAO<User> {
         this.user = this.get().get(0);
     }
 
-    public List<User> get() throws SQLException {
+    synchronized public List<User> get() throws SQLException {
         ArrayList<User> users = new ArrayList<>();
         if (user == null) {
             this.startConnection();
@@ -52,7 +52,7 @@ public class UserDAO extends DatabaseAccess implements DAO<User> {
     }
 
     @Override
-    public void add(User t) throws SQLException {
+    synchronized public void add(User t) throws SQLException {
         this.startConnection();
 
         String strInsert = "INSERT INTO " + DATABASE_NAME + "." + TABLE_NAME + " (username, password, email)" +
@@ -70,16 +70,16 @@ public class UserDAO extends DatabaseAccess implements DAO<User> {
     }
     //TODO: Remove placeholders
     @Override
-    public void edit(int id, User user) throws SQLException, IllegalArgumentException {
+    synchronized public void edit(int id, User user) throws SQLException, IllegalArgumentException {
 
     }
 
     @Override
-    public void remove(int id) throws SQLException, IllegalArgumentException {
+    synchronized public void remove(int id) throws SQLException, IllegalArgumentException {
 
     }
     /*@Override TODO: Check if we need these ones and add extra checks (does user exist)
-    public void edit(int id, User t) throws SQLException, IllegalArgumentException {
+    synchronized public void edit(int id, User t) throws SQLException, IllegalArgumentException {
         this.startConnection();
 
         String strUpdate = "UPDATE " + DATABASE_NAME + "." + TABLE_NAME + " set username = ?, password = ?, email = ? where id = ?";
@@ -98,7 +98,7 @@ public class UserDAO extends DatabaseAccess implements DAO<User> {
 
     }
     @Override
-    public void remove(int id) throws SQLException, IllegalArgumentException {
+    synchronized public void remove(int id) throws SQLException, IllegalArgumentException {
         this.startConnection();
 
         String strDelete = "DELETE FROM " + DATABASE_NAME + "." + TABLE_NAME + " where id = ?";

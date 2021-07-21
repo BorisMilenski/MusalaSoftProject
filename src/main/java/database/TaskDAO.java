@@ -23,7 +23,7 @@ public class TaskDAO extends DatabaseAccess implements DAO<Task> {
     }
 
     @Override
-    public List<Task> get() throws SQLException {
+    synchronized public List<Task> get() throws SQLException {
         if (tasks.isEmpty()) {
             this.startConnection();
 
@@ -52,7 +52,7 @@ public class TaskDAO extends DatabaseAccess implements DAO<Task> {
     }
 
     @Override
-    public void add(Task task) throws SQLException {
+    synchronized public void add(Task task) throws SQLException {
         this.startConnection();
 
         String strInsert = "INSERT INTO " + DATABASE_NAME + "." + TABLE_NAME + " (description , priority , entry_date , completion_date, user_id)" +
@@ -73,7 +73,7 @@ public class TaskDAO extends DatabaseAccess implements DAO<Task> {
         refreshTaskList();
     }
     @Override
-    public void edit(int id, Task t) throws SQLException, IllegalArgumentException {
+    synchronized public void edit(int id, Task t) throws SQLException, IllegalArgumentException {
         if (doesIdExistInList(id)) {
             this.startConnection();
 
@@ -98,7 +98,7 @@ public class TaskDAO extends DatabaseAccess implements DAO<Task> {
         }
     }
     @Override
-    public void remove(int id) throws SQLException, IllegalArgumentException {
+    synchronized public void remove(int id) throws SQLException, IllegalArgumentException {
         if (doesIdExistInList(id)) {
             this.startConnection();
 
@@ -118,7 +118,7 @@ public class TaskDAO extends DatabaseAccess implements DAO<Task> {
         }
     }
 
-    public void markTaskAsCompleted(int id, LocalDateTime completion_date) throws SQLException, IllegalArgumentException {
+    synchronized public void markTaskAsCompleted(int id, LocalDateTime completion_date) throws SQLException, IllegalArgumentException {
         if (completion_date != null) {
             if (doesIdExistInList(id)) {
                 this.startConnection();
