@@ -99,7 +99,6 @@ public class UserDAO extends DatabaseAccess implements DAO<User> {
         ResultSet resultSet = (preparedStatement.execute()) ? preparedStatement.getResultSet() : null;
         if (resultSet != null) {
             while (resultSet.next()) {
-                int id = resultSet.getInt("id");
                 String username = resultSet.getString("username");
                 usernames.add(username);
             }
