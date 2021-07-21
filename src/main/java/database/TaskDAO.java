@@ -3,6 +3,7 @@ package database;
 import entities.DAO;
 import entities.Priority;
 import entities.Task;
+import entities.User;
 import logic.BasicTask;
 
 import java.sql.*;
@@ -10,32 +11,29 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TaskDAO implements DAO {
-    private static TaskDAO instance = new TaskDAO();
-
-    private static final String DATABASE_NAME = "tasks_data";
+public class TaskDAO extends DatabaseDAO implements DAO<Task> {
     private static final String TABLE_NAME = "tasks";
-    private static final String DB_USERNAME = "DBM";
-    private static final String DB_PASSWORD = "Tn65z6&dDObh@YJRRt39OwhV";
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/" + DATABASE_NAME + "?allowPublicKeyRetrieval=true&useSSL=false";
 
-    private Connection connection;
-    private List<Task> tasks;
+    private final User user;
+    private final List<Task> tasks;
 
-    public static TaskDAO getInstance(){
-        return instance;
+    public TaskDAO(User user) {
+        this.user = user;
+        tasks = new ArrayList<>();
     }
 
     @Override
-    public List<Task> getTasks() throws SQLException {
+    public List<Task> get() throws SQLException {
         if (tasks.isEmpty()) {
             this.startConnection();
 
-            String strSelect = "SELECT * FROM " + TABLE_NAME;
+            String strSelect = "SELECT * FROM " + TABLE_NAME + " where user_id = ?";
             Statement statement = connection.createStatement();
-            System.out.println("[+] The SQL statement is: " + strSelect); // Echo For debugging
+            PreparedStatement preparedStatement = connection.prepareStatement(strSelect);
 
-            ResultSet resultSet = statement.executeQuery(strSelect);
+            preparedStatement.setInt(1, user.getId());
+
+            ResultSet resultSet = (preparedStatement.execute()) ? preparedStatement.getResultSet() : null;
             int rowCount = 0;
             while (resultSet.next()) {
                 int id = resultSet.getInt("id");
@@ -54,40 +52,43 @@ public class TaskDAO implements DAO {
     }
 
     @Override
-    public void addTask(Task task) throws SQLException {
+    public void add(Task task) throws SQLException {
         this.startConnection();
 
-        String strInsert = "INSERT INTO " + DATABASE_NAME + "." + TABLE_NAME + " (description , priority , entry_date , completion_date)" +
-                " values (?, ?, ?, ?)";
+        String strInsert = "INSERT INTO " + DATABASE_NAME + "." + TABLE_NAME + " (description , priority , entry_date , completion_date, user_id)" +
+                " values (?, ?, ?, ?, ?)";
         PreparedStatement preparedStatement = connection.prepareStatement(strInsert);
 
         preparedStatement.setString(1, task.getDescription());
         preparedStatement.setString(2, task.getPriority().toString());
         preparedStatement.setTimestamp(3, Timestamp.valueOf(task.getEntry()));
         preparedStatement.setTimestamp(4, task.getCompletion() != null ? Timestamp.valueOf(task.getCompletion()) : null);
+        preparedStatement.setInt(5, user.getId());
+
         System.out.println("[+] The SQL statement is: " + strInsert); // Echo For debugging
-        ResultSet set = (preparedStatement.execute()) ? preparedStatement.getResultSet() : null;
+        ResultSet resultSet = (preparedStatement.execute()) ? preparedStatement.getResultSet() : null;
         System.out.println("[+] Tasks Inserted" + "\n"); // Echo For debugging
 
         this.closeConnection();
         refreshTaskList();
     }
     @Override
-    public void editTask(int id, Task task) throws SQLException, IllegalArgumentException {
+    public void edit(int id, Task t) throws SQLException, IllegalArgumentException {
         if (doesIdExistInList(id)) {
             this.startConnection();
 
-            String strUpdate = "UPDATE " + DATABASE_NAME + "." + TABLE_NAME + " set description = ?, priority = ?, entry_date = ?, completion_date = ? where id = ?";
+            String strUpdate = "UPDATE " + DATABASE_NAME + "." + TABLE_NAME + " set description = ?, priority = ?, entry_date = ?, completion_date = ?, user_id where id = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(strUpdate);
 
-            preparedStatement.setString(1, task.getDescription());
-            preparedStatement.setString(2, task.getPriority().toString());
-            preparedStatement.setTimestamp(3, Timestamp.valueOf(task.getEntry()));
-            preparedStatement.setTimestamp(4, task.getCompletion() != null ? Timestamp.valueOf(task.getCompletion()) : null);
-            preparedStatement.setInt(5, id);
+            preparedStatement.setString(1, t.getDescription());
+            preparedStatement.setString(2, t.getPriority().toString());
+            preparedStatement.setTimestamp(3, Timestamp.valueOf(t.getEntry()));
+            preparedStatement.setTimestamp(4, t.getCompletion() != null ? Timestamp.valueOf(t.getCompletion()) : null);
+            preparedStatement.setInt(5, user.getId());
+            preparedStatement.setInt(6, id);
 
             System.out.println("[+] The SQL statement is: " + strUpdate); // Echo For debugging
-            ResultSet set = (preparedStatement.execute()) ? preparedStatement.getResultSet() : null;
+            ResultSet resultSet = (preparedStatement.execute()) ? preparedStatement.getResultSet() : null;
             System.out.println("[+] Tasks updated" + "\n"); // Echo For debugging
 
             this.closeConnection();
@@ -97,7 +98,7 @@ public class TaskDAO implements DAO {
         }
     }
     @Override
-    public void removeTask(int id) throws SQLException, IllegalArgumentException {
+    public void remove(int id) throws SQLException, IllegalArgumentException {
         if (doesIdExistInList(id)) {
             this.startConnection();
 
@@ -107,7 +108,7 @@ public class TaskDAO implements DAO {
             preparedStatement.setInt(1, id);
 
             System.out.println("[+] The SQL statement is: " + strDelete); // Echo For debugging
-            ResultSet set = (preparedStatement.execute()) ? preparedStatement.getResultSet() : null;
+            ResultSet resultSet = (preparedStatement.execute()) ? preparedStatement.getResultSet() : null;
             System.out.println("[+] Tasks updated" + "\n"); // Echo For debugging
 
             this.closeConnection();
@@ -117,43 +118,29 @@ public class TaskDAO implements DAO {
         }
     }
 
-    public void markTaskasCompleted(int id, LocalDateTime completion_date) throws SQLException, IllegalArgumentException {
+    public void markTaskAsCompleted(int id, LocalDateTime completion_date) throws SQLException, IllegalArgumentException {
         if (completion_date != null) {
+            if (doesIdExistInList(id)) {
+                this.startConnection();
 
-            this.startConnection();
+                String strUpdate = "UPDATE " + DATABASE_NAME + "." + TABLE_NAME + " set completion_date = ? where id = ?";
+                PreparedStatement preparedStatement = connection.prepareStatement(strUpdate);
 
-            String strUpdate = "UPDATE " + DATABASE_NAME + "." + TABLE_NAME + " set completion_date = ? where id = ?";
-            PreparedStatement preparedStatement = connection.prepareStatement(strUpdate);
+                preparedStatement.setTimestamp(1, Timestamp.valueOf(completion_date));
+                preparedStatement.setInt(2, id);
 
-            preparedStatement.setTimestamp(1, Timestamp.valueOf(completion_date));
-            preparedStatement.setInt(2, id);
+                System.out.println("[+] The SQL statement is: " + strUpdate); // Echo For debugging
+                ResultSet resultSet = (preparedStatement.execute()) ? preparedStatement.getResultSet() : null;
+                System.out.println("[+] Tasks updated" + "\n"); // Echo For debugging
 
-            System.out.println("[+] The SQL statement is: " + strUpdate); // Echo For debugging
-            ResultSet set = (preparedStatement.execute()) ? preparedStatement.getResultSet() : null;
-            System.out.println("[+] Tasks updated" + "\n"); // Echo For debugging
-
-            this.closeConnection();
-            refreshTaskList();
+                this.closeConnection();
+                refreshTaskList();
+            }
+            else{
+                throw new IllegalArgumentException("Task Id not found");
+            }
         }else{
             throw new IllegalArgumentException("completion_date cannot be null");
-        }
-    }
-
-    private TaskDAO() {
-        tasks = new ArrayList<>();
-    }
-
-    private void startConnection() throws SQLException {
-            connection = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);
-            System.out.println("[+] Connected to database");
-    }
-
-    private void closeConnection() throws SQLException {
-        if(connection != null) {
-            if (!connection.isClosed()) {
-                connection.close();
-                System.out.println("[+] Disconnected from database");
-            }
         }
     }
 
@@ -162,7 +149,7 @@ public class TaskDAO implements DAO {
     }
 
     private boolean doesIdExistInList(int id) throws SQLException {
-        this.getTasks();
+        this.get();
         return tasks.stream().anyMatch((task) -> task.getId() == id);
     }
 }
