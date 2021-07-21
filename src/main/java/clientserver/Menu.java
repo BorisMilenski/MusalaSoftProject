@@ -33,13 +33,9 @@ public class Menu {
         String description;
         String priority;
         Priority actualPriority = null;
-        messageToClient.println("Set task description:");
-        messageToClient.println(">>");
-        description = userInputReader.readLine();
+        description = getInputWithPrompt("Set task description:");
         while (true) {
-            messageToClient.println("Set task priority (low/medium/high):");
-            messageToClient.println(">>");
-            priority = userInputReader.readLine();
+            priority = getInputWithPrompt("Set task priority (low/medium/high):");
             try {
                 actualPriority = Priority.valueOf(priority.toLowerCase());
             }catch (IllegalArgumentException i){
@@ -51,30 +47,22 @@ public class Menu {
     }
 
     public String taskIDPrompt() throws IOException {
-        messageToClient.println("Enter task ID:");
-        messageToClient.println(">>");
-        return userInputReader.readLine();
+        return getInputWithPrompt("Enter task ID:");
     }
 
     public Task editTaskPrompt(Task task) throws IOException {
         while (true) {
-            messageToClient.println("Edit:\n" +
+            String input = getInputWithPrompt("Edit:\n" +
                     "{1} Description\n" +
                     "{2} Priority\n" +
                     "{3} Save");
-            messageToClient.println(">>");
-            String input = userInputReader.readLine();
             switch (input) {
                 case "1":
-                    messageToClient.println("Enter new description:");
-                    messageToClient.println(">>");
-                    input = userInputReader.readLine();
+                    input = getInputWithPrompt("Enter new description:");
                     task.setDescription(input);
                     break;
                 case "2":
-                    messageToClient.println("Enter new priority:");
-                    messageToClient.println(">>");
-                    input = userInputReader.readLine();
+                    input = getInputWithPrompt("Enter new priority:");
                     try {
                         task.setPriority(Priority.valueOf(input.toLowerCase()));
                     }catch (IllegalArgumentException i){
@@ -87,20 +75,18 @@ public class Menu {
                     messageToClient.println("[-] Invalid option!");
             }
         }
-
-
     }
 
     public User loginPrompt() throws IOException {
+        String username = null;
+        String password = null;
+        String email = null;
         while (true) {
-            messageToClient.println("Welcome! Login or register to use the app!\n" +
+            newAccount = false;
+            String input = getInputWithPrompt("Welcome! Login or register to use the app!\n" +
                     "{1} Login\n" +
                     "{2} Register");
-            messageToClient.println(">>");
-            String input = userInputReader.readLine();
-            String username = null;
-            String password = null;
-            String email = null;
+
             switch (input) {
                 case "1":
                     username = getInputWithPrompt("Username:");
@@ -111,12 +97,14 @@ public class Menu {
                     username = getInputWithPrompt("Username:");
                     password = getInputWithPrompt("Password:");
                     email = getInputWithPrompt("Email:");
+                    break;
                 default:
                     messageToClient.println("[-] Invalid option!");
+                    continue;
             }
-            return new User.UserBuilder(username,password).withEmail(email).build();
+            break;
         }
-
+        return new User.UserBuilder(username,password).withEmail(email).build();
     }
 
     public boolean isNewAccount(){
