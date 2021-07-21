@@ -13,6 +13,20 @@ public class User {
         this.email = email;
     }
 
+    public User(String username, String password, String email) {
+        this.id = -2;
+        this.username = username;
+        this.password = password;
+        this.email = email;
+    }
+
+    public User(String username, String password) {
+        this.id = -1;
+        this.username = username;
+        this.password = password;
+        this.email = "";
+    }
+
     public int getId() {
         return id;
     }

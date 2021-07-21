@@ -2,11 +2,14 @@ package clientserver;
 
 import entities.Priority;
 import entities.Task;
+import entities.User;
 import logic.BasicTask;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Menu {
     private PrintStream messageToClient;
@@ -109,4 +112,56 @@ public class Menu {
 
 
     }
+
+    public User loginPrompt() throws IOException {
+        while (true) {
+            messageToClient.println("Welcome! Login or register to use the app!\n" +
+                    "{1} Login\n" +
+                    "{2} Register");
+            messageToClient.println(">>");
+            String input = userInputReader.readLine();
+            switch (input) {
+                case "1":
+                    return login();
+                case "2":
+                    return register();
+                default:
+                    messageToClient.println("[-] Invalid option!");
+            }
+        }
+        //ArrayList<String> userpass = new ArrayList<>();
+
+    }
+
+    private User login() throws IOException {
+        String username;
+        String password;
+        //ArrayList<String> userpass = new ArrayList<>();
+        messageToClient.println("Username:");
+        messageToClient.println(">>");
+        username = userInputReader.readLine();
+        messageToClient.println("Password:");
+        messageToClient.println(">>");
+        password = userInputReader.readLine();
+        //userpass.add(username);
+        //userpass.add(password);
+        return new User(username,password);
+    }
+
+    private User register() throws IOException {
+        String username;
+        String password;
+        String email;
+        messageToClient.println("Username:");
+        messageToClient.println(">>");
+        username = userInputReader.readLine();
+        messageToClient.println("Password:");
+        messageToClient.println(">>");
+        password = userInputReader.readLine();
+        messageToClient.println("Email:");
+        messageToClient.println(">>");
+        email = userInputReader.readLine();
+        return new User(username, password, email);
+    }
+
 }

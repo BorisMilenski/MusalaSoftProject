@@ -4,6 +4,7 @@ import database.TaskDAO;
 import database.UserDAO;
 import entities.Task;
 import entities.User;
+import org.w3c.dom.UserDataHandler;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -17,6 +18,7 @@ import java.util.List;
 
 public class ClientHandler extends Thread {
     final Socket socket;
+    User currentUser = null;
 
     public ClientHandler(Socket socket) {
         this.socket = socket;
@@ -31,10 +33,23 @@ public class ClientHandler extends Thread {
             PrintStream messageToClient = new PrintStream(socket.getOutputStream(),true);
             Menu menu = new Menu(messageToClient, userInputReader);
             while (true) {
+                UserDAO userDAO = null;
                 try {
-                    User testUser = new User(1, "ivan31", "qw12asE4", "ivan_petrov@gmail.com");//TODO: Use constructor with user
-                    UserDAO userDAO = new UserDAO(testUser.getUsername(), testUser.getPassword());
-                    TaskDAO taskDAO = new TaskDAO(userDAO.getUser());
+                    if (currentUser == null) {
+                        User someUser = menu.loginPrompt();
+                        if (someUser.getId()==-1) {
+                            userDAO = new UserDAO(someUser.getUsername(), someUser.getPassword());
+                            currentUser = userDAO.getUser();
+                        }
+                        if (someUser.getId()==-2) {
+                            userDAO = new UserDAO();
+                            userDAO.add(someUser);
+                            currentUser = userDAO.getUser();
+                        }
+                    }
+                    //User testUser = new User(1, "ivan31", "qw12asE4", "ivan_petrov@gmail.com");//TODO: Use constructor with user
+                    //UserDAO userDAO = new UserDAO(currentUser.getUsername(), currentUser.getPassword());
+                    TaskDAO taskDAO = new TaskDAO(currentUser);
                     boolean exitFlag = false;
                     List<Task> tasks = taskDAO.get();
                     ArrayList<Task> completed = new ArrayList<>();

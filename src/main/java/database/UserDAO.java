@@ -2,6 +2,7 @@ package database;
 
 import entities.DAO;
 import entities.User;
+import org.w3c.dom.UserDataHandler;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -14,6 +15,8 @@ public class UserDAO extends DatabaseAccess implements DAO<User> {
     private User user;
     private String username;
     private String password;
+
+    public UserDAO() {}
 
     public UserDAO(String username, String password) throws SQLException {
         this.username = username;
@@ -61,6 +64,7 @@ public class UserDAO extends DatabaseAccess implements DAO<User> {
 
     @Override
     synchronized public void add(User t) throws SQLException {
+        System.out.println("entered add");
         this.startConnection();
 
         if (!getAllUsernames().contains(t.getUsername())) {
