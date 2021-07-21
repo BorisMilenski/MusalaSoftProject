@@ -117,38 +117,4 @@ public class UserDAO extends DatabaseAccess implements DAO<User> {
     synchronized public void remove(int id) {
 
     }
-    /*@Override TODO: Check if we need these ones and add extra checks (does user exist)
-    synchronized public void edit(int id, User t) throws SQLException, IllegalArgumentException {
-        this.startConnection();
-
-        String strUpdate = "UPDATE " + DATABASE_NAME + "." + TABLE_NAME + " set username = ?, password = ?, email = ? where id = ?";
-        PreparedStatement preparedStatement = connection.prepareStatement(strUpdate);
-
-        preparedStatement.setString(1, t.getUsername());
-        preparedStatement.setString(2, t.getPassword());
-        preparedStatement.setString(2, t.getEmail());
-        preparedStatement.setInt(4, id);
-
-        System.out.println("[+] The SQL statement is: " + strUpdate); // Echo For debugging
-        ResultSet resultSet = (preparedStatement.execute()) ? preparedStatement.getResultSet() : null;
-        System.out.println("[+] Tasks updated" + "\n"); // Echo For debugging
-
-        this.closeConnection();
-
-    }
-    @Override
-    synchronized public void remove(int id) throws SQLException, IllegalArgumentException {
-        this.startConnection();
-
-        String strDelete = "DELETE FROM " + DATABASE_NAME + "." + TABLE_NAME + " where id = ?";
-        PreparedStatement preparedStatement = connection.prepareStatement(strDelete);
-
-        preparedStatement.setInt(1, id);
-
-        System.out.println("[+] The SQL statement is: " + strDelete); // Echo For debugging
-        ResultSet resultSet = (preparedStatement.execute()) ? preparedStatement.getResultSet() : null;
-        System.out.println("[+] User deleted" + "\n"); // Echo For debugging
-
-        this.closeConnection();
-    }*/
 }

@@ -4,15 +4,14 @@ import database.TaskDAO;
 import database.UserDAO;
 import entities.Task;
 import entities.User;
-import org.w3c.dom.UserDataHandler;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.Socket;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.TreeMap;
 
 public class ClientHandler extends Thread {
@@ -47,6 +46,7 @@ public class ClientHandler extends Thread {
 
                     TreeMap<Integer,Task> completed = new TreeMap<>();
                     TreeMap<Integer,Task> notCompleted = new TreeMap<>();
+                    HashMap<Integer, Task> allTasks = new HashMap<>();
                     int taskCounter = 1;
                     for (Task task : taskDAO.get()) {
                         if (task.isCompleted()) {
@@ -54,6 +54,7 @@ public class ClientHandler extends Thread {
                         } else {
                             notCompleted.put(taskCounter, task);
                         }
+                        allTasks.put(taskCounter, task);
                         taskCounter++;
                     }
                     messageToClient.println("[+] Completed tasks:");
@@ -79,16 +80,11 @@ public class ClientHandler extends Thread {
                             break;
                         case "2":
                             try {
-                                int taskDisplayID = Integer.parseInt(menu.taskIDPrompt());
-                                int taskID;
-                                if (completed.containsKey(taskDisplayID)){
-                                    taskID = completed.get(taskDisplayID).getId();
-                                }else{
-                                    taskID = notCompleted.get(taskDisplayID).getId();
-                                }
+                                int displayID = Integer.parseInt(menu.taskIDPrompt());
+                                int taskID = allTasks.get(displayID).getId();
                                 taskDAO.remove(taskID);
                                 messageToClient.println("[+] Task removed successfully!");
-                            } catch (IndexOutOfBoundsException e) {
+                            } catch (NullPointerException e) {
                                 messageToClient.println("[-] Invalid task ID!");
                             } catch (NumberFormatException e) {
                                 messageToClient.println("[-] Enter a number!");
@@ -96,13 +92,8 @@ public class ClientHandler extends Thread {
                             break;
                         case "3":
                             try {
-                                int taskDisplayID = Integer.parseInt(menu.taskIDPrompt());
-                                int taskID;
-                                if (completed.containsKey(taskDisplayID)){
-                                    taskID = completed.get(taskDisplayID).getId();
-                                }else{
-                                    taskID = notCompleted.get(taskDisplayID).getId();
-                                }
+                                int displayID = Integer.parseInt(menu.taskIDPrompt());
+                                int taskID = allTasks.get(displayID).getId();
                                 taskDAO.markTaskAsCompleted(taskID, LocalDateTime.now());
                                 messageToClient.println("[+] Task marked as completed!");
                             } catch (IndexOutOfBoundsException e) {
@@ -113,13 +104,8 @@ public class ClientHandler extends Thread {
                             break;
                         case "4":
                             try {
-                                int taskDisplayID = Integer.parseInt(menu.taskIDPrompt());
-                                Task taskToEdit;
-                                if (completed.containsKey(taskDisplayID)){
-                                    taskToEdit = completed.get(taskDisplayID);
-                                }else{
-                                    taskToEdit = notCompleted.get(taskDisplayID);
-                                }
+                                int displayID = Integer.parseInt(menu.taskIDPrompt());
+                                Task taskToEdit = allTasks.get(displayID);
                                 Task editedTask = menu.editTaskPrompt(taskToEdit);
                                 messageToClient.println("editedTask id is: " + editedTask.getId());
                                 taskDAO.edit(editedTask.getId(),editedTask);

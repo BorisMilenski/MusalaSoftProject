@@ -8,8 +8,6 @@ import logic.BasicTask;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Menu {
     private PrintStream messageToClient;
@@ -100,17 +98,24 @@ public class Menu {
                     "{2} Register");
             messageToClient.println(">>");
             String input = userInputReader.readLine();
+            String username = null;
+            String password = null;
+            String email = null;
             switch (input) {
                 case "1":
-                    return login();
+                    username = getInputWithPrompt("Username:");
+                    password = getInputWithPrompt("Password:");
+                    break;
                 case "2":
                     newAccount = true;
-                    return register();
+                    username = getInputWithPrompt("Username:");
+                    password = getInputWithPrompt("Password:");
+                    email = getInputWithPrompt("Email:");
                 default:
                     messageToClient.println("[-] Invalid option!");
             }
+            return new User.UserBuilder(username,password).withEmail(email).build();
         }
-        //ArrayList<String> userpass = new ArrayList<>();
 
     }
 
@@ -118,32 +123,11 @@ public class Menu {
         return newAccount;
     }
 
-    private User login() throws IOException {
-        String username;
-        String password;
-        messageToClient.println("Username:");
+    private String getInputWithPrompt(String prompt) throws IOException {
+        messageToClient.println(prompt);
         messageToClient.println(">>");
-        username = userInputReader.readLine();
-        messageToClient.println("Password:");
-        messageToClient.println(">>");
-        password = userInputReader.readLine();
-        return new User.UserBuilder(username,password).build();
+        return userInputReader.readLine();
     }
 
-    private User register() throws IOException {
-        String username;
-        String password;
-        String email;
-        messageToClient.println("Username:");
-        messageToClient.println(">>");
-        username = userInputReader.readLine();
-        messageToClient.println("Password:");
-        messageToClient.println(">>");
-        password = userInputReader.readLine();
-        messageToClient.println("Email:");
-        messageToClient.println(">>");
-        email = userInputReader.readLine();
-        return new User.UserBuilder(username, password).withEmail(email).build();
-    }
 
 }
