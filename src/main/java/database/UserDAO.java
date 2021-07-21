@@ -20,6 +20,8 @@ public class UserDAO extends DatabaseAccess implements DAO<User> {
         this.user = this.get().get(0);
     }
 
+
+    @Override
     synchronized public List<User> get() throws SQLException {
         ArrayList<User> users = new ArrayList<>();
         if (user == null) {
@@ -33,20 +35,22 @@ public class UserDAO extends DatabaseAccess implements DAO<User> {
             preparedStatement.setString(2, this.password);
 
             ResultSet resultSet = (preparedStatement.execute()) ? preparedStatement.getResultSet() : null;
-            while (resultSet.next()) {
-                int id = resultSet.getInt("id");
-                String username = resultSet.getString("username");
-                String password = resultSet.getString("password");
-                String email =  resultSet.getString("email");
-                users.add(new User(id, username, password, email)) ;
+            if (resultSet != null) {
+                while (resultSet.next()) {
+                    int id = resultSet.getInt("id");
+                    String username = resultSet.getString("username");
+                    String password = resultSet.getString("password");
+                    String email = resultSet.getString("email");
+                    users.add(new User(id, username, password, email));
+                }
             }
             this.closeConnection();
         }
         if (users.isEmpty()){
-            //TODO: Throw exception
+            throw new SQLDataException("No user found");
         }
         if (users.size() > 1){
-            //TODO; Throw exception
+            throw new SQLDataException("Multiple users found");
         }
         return users;
     }

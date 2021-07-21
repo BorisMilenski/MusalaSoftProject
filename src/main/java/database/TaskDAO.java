@@ -28,25 +28,29 @@ public class TaskDAO extends DatabaseAccess implements DAO<Task> {
             this.startConnection();
 
             String strSelect = "SELECT * FROM " + TABLE_NAME + " where user_id = ?";
-            Statement statement = connection.createStatement();
             PreparedStatement preparedStatement = connection.prepareStatement(strSelect);
 
             preparedStatement.setInt(1, user.getId());
 
             ResultSet resultSet = (preparedStatement.execute()) ? preparedStatement.getResultSet() : null;
             int rowCount = 0;
-            while (resultSet.next()) {
-                int id = resultSet.getInt("id");
-                String description = resultSet.getString("description");
-                Priority priority =  Priority.valueOf(resultSet.getString("priority"));
-                LocalDateTime entryDate = resultSet.getTimestamp("entry_date").toLocalDateTime();
-                Timestamp completionTimestamp = resultSet.getTimestamp("completion_date");
-                LocalDateTime completionDate = completionTimestamp != null ? completionTimestamp.toLocalDateTime() : null;
-                tasks.add(new BasicTask(id, description, priority, entryDate, completionDate));
-                ++rowCount;
+            if (resultSet != null) {
+                while (resultSet.next()) {
+                    int id = resultSet.getInt("id");
+                    String description = resultSet.getString("description");
+                    Priority priority = Priority.valueOf(resultSet.getString("priority"));
+                    LocalDateTime entryDate = resultSet.getTimestamp("entry_date").toLocalDateTime();
+                    Timestamp completionTimestamp = resultSet.getTimestamp("completion_date");
+                    LocalDateTime completionDate = completionTimestamp != null ? completionTimestamp.toLocalDateTime() : null;
+                    tasks.add(new BasicTask(id, description, priority, entryDate, completionDate));
+                    ++rowCount;
+                }
+                System.out.println("[+] Total number of records = " + rowCount + "\n");
             }
-            System.out.println("[+] Total number of records = " + rowCount + "\n");
             this.closeConnection();
+        }
+        if (tasks.isEmpty()){
+            throw new SQLDataException("User Id not found or no Task data Found");
         }
         return tasks;
     }

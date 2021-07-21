@@ -1,5 +1,6 @@
 package entities;
 
+import java.sql.SQLDataException;
 import java.sql.SQLException;
 import java.util.List;
 
