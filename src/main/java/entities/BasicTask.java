@@ -1,7 +1,4 @@
-package logic;
-
-import entities.Priority;
-import entities.Task;
+package entities;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;

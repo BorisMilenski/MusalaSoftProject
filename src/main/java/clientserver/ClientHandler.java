@@ -109,6 +109,5 @@ public class ClientHandler extends Thread {
             System.out.println("[-] Error");
             e.printStackTrace();
         }
-
     }
 }

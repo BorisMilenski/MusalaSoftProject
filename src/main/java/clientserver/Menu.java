@@ -4,7 +4,7 @@ import database.TaskDAO;
 import entities.Priority;
 import entities.Task;
 import entities.User;
-import logic.BasicTask;
+import entities.BasicTask;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -38,14 +38,13 @@ public class Menu {
         String priority;
         Priority actualPriority = null;
         description = getInputWithPrompt("Set task description:");
-        while (true) {
+        while (actualPriority == null) {
             priority = getInputWithPrompt("Set task priority (low/medium/high):");
             try {
                 actualPriority = Priority.valueOf(priority.toLowerCase());
             }catch (IllegalArgumentException i){
                 messageToClient.println("[-] Invalid priority!");
             }
-            if (actualPriority != null) break;
         }
         return new BasicTask(description, actualPriority);
     }
@@ -82,8 +81,8 @@ public class Menu {
     }
 
     public User loginPrompt() throws IOException {
-        String username = null;
-        String password = null;
+        String username;
+        String password;
         String email = null;
         while (true) {
             newAccount = false;

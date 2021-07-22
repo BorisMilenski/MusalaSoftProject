@@ -1,17 +1,8 @@
 package clientserver;
 
-import entities.Priority;
-import entities.Task;
-import logic.BasicTask;
-
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ServerApp {
     public static void main(String[] args) {
