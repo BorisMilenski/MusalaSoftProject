@@ -1,6 +1,4 @@
-# MusalaSoftProject
-
-To-do list
+# To-Do-List
 
 A project, designed as a part of our team's internship with MusalaSoft
 
@@ -8,14 +6,14 @@ A project, designed as a part of our team's internship with MusalaSoft
 
 The project aims to assist in day-to-day task management by providing an easy-to-use list, where users can note down what they have to do. It allows users to maintain a sense of accoplishment by displaying already completed tasks, as well as tasks that are queued up.
 
-2. Features
+ 2. Features
 
     + task management - users can add, edit or remove tasks, as well as setting tasks as completed
     + prioritizing - users can set a priority to every task that they enter
     + user management - the app is designed to handle multiple users, featuring a register/logic field at start-up
 
 
-3. Setup guide
+3. Setup guide 
 
     + Requirements: MySQL Server
     + Run the Database setup script, which is located in the repository, in MySQL Workbench. You'd need permissions to create and manage a database, as well as create and manage users. It will setup the database with some sample data. It wlll also create a user that is used by the server to access the database.
