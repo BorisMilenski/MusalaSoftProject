@@ -25,12 +25,18 @@ public class Menu {
     }
 
     public boolean mainMenu(TaskDAO taskDAO, HashMap<Integer, Task> allTasks) throws IOException, SQLException {
-        String input = getInputWithPrompt("Select an option:\n" +
-                "{1} Add task\n" +
-                "{2} Remove task\n" +
-                "{3} Mark task as completed\n" +
-                "{4} Edit task\n" +
-                "{exit} Quit");
+       String input;
+        try {
+            input = getInputWithPrompt("Select an option:\n" +
+                    "{1} Add task\n" +
+                    "{2} Remove task\n" +
+                    "{3} Mark task as completed\n" +
+                    "{4} Edit task\n" +
+                    "{exit} Quit");
+        }catch (IOException e){
+            System.out.println("[-] " + e.getMessage());
+            return false;
+        }
 
         switch (input) {
             case "1":
