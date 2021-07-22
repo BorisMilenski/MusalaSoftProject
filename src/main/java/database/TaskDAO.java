@@ -4,7 +4,7 @@ import entities.DAO;
 import entities.Priority;
 import entities.Task;
 import entities.User;
-import logic.BasicTask;
+import entities.BasicTask;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -48,9 +48,6 @@ public class TaskDAO extends DatabaseAccess implements DAO<Task> {
                 System.out.println("[+] Total number of records = " + rowCount + "\n");
             }
             this.closeConnection();
-        }
-        if (tasks.isEmpty()){
-            throw new SQLDataException("[-] User Id not found or no Task data Found");
         }
         return tasks;
     }

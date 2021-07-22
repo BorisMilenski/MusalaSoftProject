@@ -1,16 +1,22 @@
 package clientserver;
 
+import database.TaskDAO;
 import entities.Priority;
 import entities.Task;
-import logic.BasicTask;
+import entities.User;
+import entities.BasicTask;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.TreeMap;
 
 public class Menu {
     private PrintStream messageToClient;
     private BufferedReader userInputReader;
+    private boolean newAccount = false;
 
     public Menu (PrintStream messageToClient, BufferedReader userInputReader) {
         this.messageToClient = messageToClient;
@@ -30,74 +36,40 @@ public class Menu {
     public Task addTaskPrompt() throws IOException {
         String description;
         String priority;
-        Priority priorityEnum = null;
-        boolean priorityIsSet = false;
-        messageToClient.println("Set task description:");
-        messageToClient.println(">>");
-        description = userInputReader.readLine();
-        while (true) {
-            messageToClient.println("Set task priority (low/medium/high):");
-            messageToClient.println(">>");
-            priority = userInputReader.readLine();
-            switch (priority) {
-                case "low":
-                    priorityEnum = Priority.low;
-                    priorityIsSet = true;
-                    break;
-                case "medium":
-                    priorityEnum = Priority.medium;
-                    priorityIsSet = true;
-                    break;
-                case "high":
-                    priorityEnum = Priority.high;
-                    priorityIsSet = true;
-                    break;
-                default:
-                    messageToClient.println("[-] Invalid priority value!");
-                    break;
+        Priority actualPriority = null;
+        description = getInputWithPrompt("Set task description:");
+        while (actualPriority == null) {
+            priority = getInputWithPrompt("Set task priority (low/medium/high):");
+            try {
+                actualPriority = Priority.valueOf(priority.toLowerCase());
+            }catch (IllegalArgumentException i){
+                messageToClient.println("[-] Invalid priority!");
             }
-            if (priorityIsSet) break;
         }
-        return new BasicTask(description,priorityEnum);
+        return new BasicTask(description, actualPriority);
     }
 
     public String taskIDPrompt() throws IOException {
-        messageToClient.println("Enter task ID:");
-        messageToClient.println(">>");
-        return userInputReader.readLine();
+        return getInputWithPrompt("Enter task ID:");
     }
 
     public Task editTaskPrompt(Task task) throws IOException {
         while (true) {
-            messageToClient.println("Edit:\n" +
+            String input = getInputWithPrompt("Edit:\n" +
                     "{1} Description\n" +
                     "{2} Priority\n" +
                     "{3} Save");
-            messageToClient.println(">>");
-            String input = userInputReader.readLine();
             switch (input) {
                 case "1":
-                    messageToClient.println("Enter new description:");
-                    messageToClient.println(">>");
-                    input = userInputReader.readLine();
+                    input = getInputWithPrompt("Enter new description:");
                     task.setDescription(input);
                     break;
                 case "2":
-                    messageToClient.println("Enter new priority:");
-                    messageToClient.println(">>");
-                    input = userInputReader.readLine();
-                    switch (input) {
-                        case "low":
-                            task.setPriority(Priority.low);
-                            break;
-                        case "medium":
-                            task.setPriority(Priority.medium);
-                            break;
-                        case "high":
-                            task.setPriority(Priority.high);
-                            break;
-                        default:
-                            messageToClient.println("[-] Invalid priority!");
+                    input = getInputWithPrompt("Enter new priority:");
+                    try {
+                        task.setPriority(Priority.valueOf(input.toLowerCase()));
+                    }catch (IllegalArgumentException i){
+                        messageToClient.println("[-] Invalid priority!");
                     }
                     break;
                 case "3":
@@ -106,7 +78,75 @@ public class Menu {
                     messageToClient.println("[-] Invalid option!");
             }
         }
-
-
     }
+
+    public User loginPrompt() throws IOException {
+        String username;
+        String password;
+        String email = null;
+        while (true) {
+            newAccount = false;
+            String input = getInputWithPrompt("Welcome! Login or register to use the app!\n" +
+                    "{1} Login\n" +
+                    "{2} Register");
+
+            switch (input) {
+                case "1":
+                    username = getInputWithPrompt("Username:");
+                    password = getInputWithPrompt("Password:");
+                    break;
+                case "2":
+                    newAccount = true;
+                    username = getInputWithPrompt("Username:");
+                    password = getInputWithPrompt("Password:");
+                    email = getInputWithPrompt("Email:");
+                    break;
+                default:
+                    messageToClient.println("[-] Invalid option!");
+                    continue;
+            }
+            break;
+        }
+        return new User.UserBuilder(username,password).withEmail(email).build();
+    }
+
+    public void splitAndPrintTasks(TaskDAO taskDAO, HashMap<Integer, Task> allTasks) throws SQLException {
+        TreeMap<Integer,Task> completed = new TreeMap<>();
+        TreeMap<Integer,Task> notCompleted = new TreeMap<>();
+
+        int taskCounter = 1;
+        for (Task task : taskDAO.get()) {
+            if (task.isCompleted()) {
+                completed.put(taskCounter, task);
+            } else {
+                notCompleted.put(taskCounter, task);
+            }
+            allTasks.put(taskCounter, task);
+            taskCounter++;
+        }
+        messageToClient.println("[+] Completed tasks:");
+        if (completed.isEmpty()) {
+            messageToClient.println("None");
+        } else {
+            completed.forEach((index, task)-> messageToClient.println(index + ". " + task));
+        }
+        messageToClient.println("[*] Remaining tasks:");
+        if (notCompleted.isEmpty()) {
+            messageToClient.println("None");
+        } else {
+            notCompleted.forEach((index, task)-> messageToClient.println(index + ". " + task));
+        }
+    }
+
+    public boolean isNewAccount(){
+        return newAccount;
+    }
+
+    private String getInputWithPrompt(String prompt) throws IOException {
+        messageToClient.println(prompt);
+        messageToClient.println(">>");
+        return userInputReader.readLine();
+    }
+
+
 }

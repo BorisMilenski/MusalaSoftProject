@@ -10,13 +10,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.Socket;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 
 public class ClientHandler extends Thread {
-    final Socket socket;
+    private final Socket socket;
+    private User currentUser = null;
+    private boolean isRunning = true;
 
     public ClientHandler(Socket socket) {
         this.socket = socket;
@@ -30,45 +30,22 @@ public class ClientHandler extends Thread {
             BufferedReader userInputReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             PrintStream messageToClient = new PrintStream(socket.getOutputStream(),true);
             Menu menu = new Menu(messageToClient, userInputReader);
-            while (true) {
+            while (isRunning) {
+                UserDAO userDAO = new UserDAO();
                 try {
-                    User testUser = new User(1, "ivan31", "qw12asE4", "ivan_petrov@gmail.com");//TODO: Use constructor with user
-                    UserDAO userDAO = new UserDAO(testUser.getUsername(), testUser.getPassword());
-                    TaskDAO taskDAO = new TaskDAO(userDAO.getUser());
-                    boolean exitFlag = false;
-                    List<Task> tasks = taskDAO.get();
-                    ArrayList<Task> completed = new ArrayList<>();
-                    ArrayList<Task> notCompleted = new ArrayList<>();
-                    int taskCounter = 1;
-                    for (Task task : tasks) {
-                        if (task.isCompleted()) {
-                            completed.add(task);
-                        } else {
-                            notCompleted.add(task);
+                    if (currentUser == null) {
+                        currentUser = menu.loginPrompt();
+                        if (menu.isNewAccount()) {
+                            userDAO.add(currentUser);
                         }
+                        userDAO.initialize(currentUser.getUsername(), currentUser.getPassword());
+                        currentUser = userDAO.getUser();
                     }
-                    tasks.clear();
-                    tasks.addAll(completed);
-                    tasks.addAll(notCompleted);
-                    //ordering tasks to match indexes in array
-                    messageToClient.println("[+] Completed tasks:");
-                    if (completed.isEmpty()) {
-                        messageToClient.println("None");
-                    } else {
-                        for (Task task : completed) {
-                            messageToClient.println(taskCounter + ". " + task);
-                            taskCounter++;
-                        }
-                    }
-                    messageToClient.println("[*] Remaining tasks:");
-                    if (notCompleted.isEmpty()) {
-                        messageToClient.println("None");
-                    } else {
-                        for (Task task : notCompleted) {
-                            messageToClient.println(taskCounter + ". " + task);
-                            taskCounter++;
-                        }
-                    }
+                    TaskDAO taskDAO = new TaskDAO(currentUser);
+
+                    HashMap<Integer, Task> allTasks = new HashMap<>();
+
+                    menu.splitAndPrintTasks(taskDAO, allTasks);
                     menu.printMainMenu();
                     input = userInputReader.readLine();
 
@@ -80,11 +57,11 @@ public class ClientHandler extends Thread {
                             break;
                         case "2":
                             try {
-                                String taskDisplayID = menu.taskIDPrompt();
-                                int taskID = getRealTaskID(tasks,taskDisplayID);
+                                int displayID = Integer.parseInt(menu.taskIDPrompt());
+                                int taskID = allTasks.get(displayID).getId();
                                 taskDAO.remove(taskID);
                                 messageToClient.println("[+] Task removed successfully!");
-                            } catch (IndexOutOfBoundsException e) {
+                            } catch (NullPointerException e) {
                                 messageToClient.println("[-] Invalid task ID!");
                             } catch (NumberFormatException e) {
                                 messageToClient.println("[-] Enter a number!");
@@ -92,8 +69,8 @@ public class ClientHandler extends Thread {
                             break;
                         case "3":
                             try {
-                                String taskDisplayID = menu.taskIDPrompt();
-                                int taskID = getRealTaskID(tasks,taskDisplayID);
+                                int displayID = Integer.parseInt(menu.taskIDPrompt());
+                                int taskID = allTasks.get(displayID).getId();
                                 taskDAO.markTaskAsCompleted(taskID, LocalDateTime.now());
                                 messageToClient.println("[+] Task marked as completed!");
                             } catch (IndexOutOfBoundsException e) {
@@ -104,11 +81,11 @@ public class ClientHandler extends Thread {
                             break;
                         case "4":
                             try {
-                                String taskDisplayID = menu.taskIDPrompt();
-                                int taskID=getRealTaskID(tasks,taskDisplayID);
-                                Task editedTask = menu.editTaskPrompt(tasks.get(Integer.parseInt(taskDisplayID)-1));
+                                int displayID = Integer.parseInt(menu.taskIDPrompt());
+                                Task taskToEdit = allTasks.get(displayID);
+                                Task editedTask = menu.editTaskPrompt(taskToEdit);
                                 messageToClient.println("editedTask id is: " + editedTask.getId());
-                                taskDAO.edit(taskID,editedTask);
+                                taskDAO.edit(editedTask.getId(),editedTask);
                             } catch (IndexOutOfBoundsException e) {
                                 messageToClient.println("[-] Invalid task ID!");
                             } catch (NumberFormatException e) {
@@ -116,7 +93,7 @@ public class ClientHandler extends Thread {
                             }
                             break;
                         case "exit":
-                            exitFlag = true;
+                            isRunning = false;
                             messageToClient.println("{close}");
                             socket.close();
                             System.out.println("[+] Client disconnected > " + socket);
@@ -124,10 +101,7 @@ public class ClientHandler extends Thread {
                         default:
                             messageToClient.println("[-] Invalid option!");
                     }
-                    if (exitFlag) break;
-                } catch (SQLException s) {
-                    messageToClient.println(s.getMessage());
-                } catch (IllegalArgumentException e) {
+                } catch (Exception e) {
                     messageToClient.println(e.getMessage());
                 }
             }
@@ -135,11 +109,5 @@ public class ClientHandler extends Thread {
             System.out.println("[-] Error");
             e.printStackTrace();
         }
-
-    }
-
-    private int getRealTaskID (List<Task> tasks, String displayID) throws IndexOutOfBoundsException, NumberFormatException {
-        Task task = tasks.get(Integer.parseInt(displayID)-1);
-        return task.getId();
     }
 }
