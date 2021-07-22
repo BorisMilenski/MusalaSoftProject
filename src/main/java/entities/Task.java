@@ -1,12 +1,11 @@
 package entities;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public interface Task{
     boolean isCompleted();
-    int completionTimeFromSet();
-    int completionTimeFromCustom(LocalDate date);
+    String completionTimeFromSet();
+    String completionTimeFromCustom(LocalDateTime date);
     int getId();
     Priority getPriority();
     String getDescription();

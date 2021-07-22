@@ -1,10 +1,12 @@
 package entities;
 
+import java.sql.SQLDataException;
+import java.sql.SQLException;
 import java.util.List;
 
-public interface DAO { //TODO: Refactor after merge, DAO is an independent pattern
-    List<Task> getTasks();
-    void addTask(Task task);
-    void editTask(int id, Task task);
-    void removeTask(int id, Task task);
+public interface DAO<T> {
+    List<T> get() throws SQLException;
+    void add(T t) throws SQLException;
+    void edit(int id, T t) throws SQLException, IllegalArgumentException;
+    void remove(int id) throws SQLException, IllegalArgumentException;
 }
