@@ -10,6 +10,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.TreeMap;
 
@@ -23,17 +24,66 @@ public class Menu {
         this.userInputReader = userInputReader;
     }
 
-    public void printMainMenu() {
-        messageToClient.println("Select an option:\n" +
+    public boolean mainMenu(TaskDAO taskDAO, HashMap<Integer, Task> allTasks) throws IOException, SQLException {
+        String input = getInputWithPrompt("Select an option:\n" +
                 "{1} Add task\n" +
                 "{2} Remove task\n" +
                 "{3} Mark task as completed\n" +
                 "{4} Edit task\n" +
                 "{exit} Quit");
-        messageToClient.println(">>");
+
+        switch (input) {
+            case "1":
+                Task task = addTaskPrompt();
+                taskDAO.add(task);
+                messageToClient.println("[+] Task added successfully!");
+                return true;
+            case "2":
+                try {
+                    int displayID = Integer.parseInt(taskIDPrompt());
+                    int taskID = allTasks.get(displayID).getId();
+                    taskDAO.remove(taskID);
+                    messageToClient.println("[+] Task removed successfully!");
+                } catch (NullPointerException e) {
+                    messageToClient.println("[-] Invalid task ID!");
+                } catch (NumberFormatException e) {
+                    messageToClient.println("[-] Enter a number!");
+                }
+                return true;
+            case "3":
+                try {
+                    int displayID = Integer.parseInt(taskIDPrompt());
+                    int taskID = allTasks.get(displayID).getId();
+                    taskDAO.markTaskAsCompleted(taskID, LocalDateTime.now());
+                    messageToClient.println("[+] Task marked as completed!");
+                } catch (IndexOutOfBoundsException e) {
+                    messageToClient.println("[-] Invalid task ID!");
+                } catch (NumberFormatException e) {
+                    messageToClient.println("[-] Enter a number!");
+                }
+                return true;
+            case "4":
+                try {
+                    int displayID = Integer.parseInt(taskIDPrompt());
+                    Task taskToEdit = allTasks.get(displayID);
+                    Task editedTask = editTaskPrompt(taskToEdit);
+                    taskDAO.edit(editedTask.getId(),editedTask);
+                } catch (IndexOutOfBoundsException e) {
+                    messageToClient.println("[-] Invalid task ID!");
+                } catch (NumberFormatException e) {
+                    messageToClient.println("[-] Enter a number!");
+                }
+                return true;
+            case "exit":
+                messageToClient.println("{close}");
+                return false;
+            default:
+                messageToClient.println("[-] Invalid option!");
+                return true;
+        }
     }
 
-    public Task addTaskPrompt() throws IOException {
+    private Task addTaskPrompt() throws IOException {
         String description;
         String priority;
         Priority actualPriority = null;
@@ -49,11 +99,11 @@ public class Menu {
         return new BasicTask(description, actualPriority);
     }
 
-    public String taskIDPrompt() throws IOException {
+    private String taskIDPrompt() throws IOException {
         return getInputWithPrompt("Enter task ID:");
     }
 
-    public Task editTaskPrompt(Task task) throws IOException {
+    private Task editTaskPrompt(Task task) throws IOException {
         while (true) {
             String input = getInputWithPrompt("Edit:\n" +
                     "{1} Description\n" +
