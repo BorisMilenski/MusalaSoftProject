@@ -1,5 +1,9 @@
 package entities;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
+
 public class User {
     private int id;
     private String username;
@@ -44,13 +48,24 @@ public class User {
             return this;
         }
 
-        public User build(){
+        public User build() {
             User user = new User();
             user.id = this.id;
             user.username = this.username;
-            user.password = this.password;
+            user.password = mask(this.password);
             user.email = this.email;
             return user;
+        }
+
+        private String mask (String string) {
+            try {
+                MessageDigest md = MessageDigest.getInstance("MD5");
+                byte [] arr = md.digest(string.getBytes());
+                return Base64.getEncoder().encodeToString(arr);
+            } catch (NoSuchAlgorithmException e) {
+                return string;
+            }
+
         }
     }
 
