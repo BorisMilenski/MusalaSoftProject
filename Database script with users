@@ -3,6 +3,9 @@ CREATE DATABASE IF NOT EXISTS tasks_data;
 
 USE tasks_data;
 
+CREATE USER IF NOT EXISTS 'DBMusala'@'localhost' IDENTIFIED BY 'Tn65z6&dDObh@YJRRt39OwhV';
+GRANT ALL ON tasks_data.* TO 'DBMusala'@'localhost';
+
 DROP TABLE IF EXISTS users;
 CREATE TABLE users(
 id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
