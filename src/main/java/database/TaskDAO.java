@@ -4,7 +4,7 @@ import entities.DAO;
 import entities.Priority;
 import entities.Task;
 import entities.User;
-import logic.BasicTask;
+import entities.BasicTask;
 
 import java.sql.*;
 import java.time.LocalDateTime;

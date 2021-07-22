@@ -107,7 +107,7 @@ public class UserDAO extends DatabaseAccess implements DAO<User> {
         this.closeConnection();
         return usernames;
     }
-    //TODO: Remove placeholders
+
     @Override
     synchronized public void edit(int id, User user) {
 
