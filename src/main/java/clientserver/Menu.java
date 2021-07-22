@@ -131,10 +131,11 @@ public class Menu {
     }
 
     public User loginPrompt() throws IOException {
-        String username;
-        String password;
+        String username = null;
+        String password = null;
         String email = null;
-        while (true) {
+        boolean isRunning = true;
+        while (isRunning) {
             newAccount = false;
             String input = getInputWithPrompt("Welcome! Login or register to use the app!\n" +
                     "{1} Login\n" +
@@ -144,18 +145,19 @@ public class Menu {
                 case "1":
                     username = getInputWithPrompt("Username:");
                     password = getInputWithPrompt("Password:");
+                    isRunning = false;
                     break;
                 case "2":
                     newAccount = true;
                     username = getInputWithPrompt("Username:");
                     password = getInputWithPrompt("Password:");
                     email = getInputWithPrompt("Email:");
+                    isRunning = false;
                     break;
                 default:
                     messageToClient.println("[-] Invalid option!");
-                    continue;
+                    break;
             }
-            break;
         }
         return new User.UserBuilder(username,password).withEmail(email).build();
     }
