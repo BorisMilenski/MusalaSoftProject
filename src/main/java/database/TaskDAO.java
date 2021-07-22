@@ -49,9 +49,6 @@ public class TaskDAO extends DatabaseAccess implements DAO<Task> {
             }
             this.closeConnection();
         }
-//        if (tasks.isEmpty()){
-//            throw new SQLDataException("[-] User Id not found or no Task data Found");
-//        }
         return tasks;
     }
 

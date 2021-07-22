@@ -24,10 +24,10 @@ ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 INSERT INTO users (username, password, email)
-VALUES('ivan31', 'qw12asE4', 'ivan_petrov@gmail.com'),
-('mihaiLov95', 'zWcV5Byt', 'peter#mihailov@gmail.com'),
-('STerTWor', '123456', 'iva1234@abv.bg'),
-('oSiVeNyB', 'Gj6587T', 'mariq$petrova@gmail.com');
+VALUES('ivan31', md5('qw12asE4'), 'ivan_petrov@gmail.com'),
+('mihaiLov95', md5('zWcV5Byt'), 'peter#mihailov@gmail.com'),
+('STerTWor', md5('123456'), 'iva1234@abv.bg'),
+('oSiVeNyB', md5('Gj6587T'), 'mariq$petrova@gmail.com');
 
 INSERT INTO tasks (description, priority, entry_date, completion_date, user_id)
 VALUES ('Check your email inbox', 'medium', '2021-07-20 17:00:00', '2021-07-24 12:00:00', 1),
