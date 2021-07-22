@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.Socket;
+import java.sql.SQLException;
 import java.util.HashMap;
 
 public class ClientHandler extends Thread {
