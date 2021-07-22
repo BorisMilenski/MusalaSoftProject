@@ -1,5 +1,6 @@
 package clientserver;
 
+import database.TaskDAO;
 import entities.Priority;
 import entities.Task;
 import entities.User;
@@ -8,6 +9,9 @@ import logic.BasicTask;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.TreeMap;
 
 public class Menu {
     private PrintStream messageToClient;
@@ -105,6 +109,34 @@ public class Menu {
             break;
         }
         return new User.UserBuilder(username,password).withEmail(email).build();
+    }
+
+    public void splitAndPrintTasks(TaskDAO taskDAO, HashMap<Integer, Task> allTasks) throws SQLException {
+        TreeMap<Integer,Task> completed = new TreeMap<>();
+        TreeMap<Integer,Task> notCompleted = new TreeMap<>();
+
+        int taskCounter = 1;
+        for (Task task : taskDAO.get()) {
+            if (task.isCompleted()) {
+                completed.put(taskCounter, task);
+            } else {
+                notCompleted.put(taskCounter, task);
+            }
+            allTasks.put(taskCounter, task);
+            taskCounter++;
+        }
+        messageToClient.println("[+] Completed tasks:");
+        if (completed.isEmpty()) {
+            messageToClient.println("None");
+        } else {
+            completed.forEach((index, task)-> messageToClient.println(index + ". " + task));
+        }
+        messageToClient.println("[*] Remaining tasks:");
+        if (notCompleted.isEmpty()) {
+            messageToClient.println("None");
+        } else {
+            notCompleted.forEach((index, task)-> messageToClient.println(index + ". " + task));
+        }
     }
 
     public boolean isNewAccount(){

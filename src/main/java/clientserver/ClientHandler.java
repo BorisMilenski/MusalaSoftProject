@@ -12,7 +12,6 @@ import java.io.PrintStream;
 import java.net.Socket;
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.TreeMap;
 
 public class ClientHandler extends Thread {
     private final Socket socket;
@@ -44,31 +43,9 @@ public class ClientHandler extends Thread {
                     }
                     TaskDAO taskDAO = new TaskDAO(currentUser);
 
-                    TreeMap<Integer,Task> completed = new TreeMap<>();
-                    TreeMap<Integer,Task> notCompleted = new TreeMap<>();
                     HashMap<Integer, Task> allTasks = new HashMap<>();
-                    int taskCounter = 1;
-                    for (Task task : taskDAO.get()) {
-                        if (task.isCompleted()) {
-                            completed.put(taskCounter, task);
-                        } else {
-                            notCompleted.put(taskCounter, task);
-                        }
-                        allTasks.put(taskCounter, task);
-                        taskCounter++;
-                    }
-                    messageToClient.println("[+] Completed tasks:");
-                    if (completed.isEmpty()) {
-                        messageToClient.println("None");
-                    } else {
-                        completed.forEach((index, task)-> messageToClient.println(index + ". " + task));
-                    }
-                    messageToClient.println("[*] Remaining tasks:");
-                    if (notCompleted.isEmpty()) {
-                        messageToClient.println("None");
-                    } else {
-                        notCompleted.forEach((index, task)-> messageToClient.println(index + ". " + task));
-                    }
+
+                    menu.splitAndPrintTasks(taskDAO, allTasks);
                     menu.printMainMenu();
                     input = userInputReader.readLine();
 
