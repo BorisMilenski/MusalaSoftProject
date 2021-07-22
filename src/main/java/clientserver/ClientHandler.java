@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.Socket;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 
@@ -34,12 +35,19 @@ public class ClientHandler extends Thread {
                 UserDAO userDAO = new UserDAO();
                 try {
                     if (currentUser == null) {
-                        currentUser = menu.loginPrompt();
-                        if (menu.isNewAccount()) {
-                            userDAO.add(currentUser);
+                        while (true) {
+                            currentUser = menu.loginPrompt();
+                            if (menu.isNewAccount()) {
+                                userDAO.add(currentUser);
+                            }
+                            userDAO.initialize(currentUser.getUsername(), currentUser.getPassword());
+                            try {
+                                currentUser = userDAO.getUser();
+                                break;
+                            } catch (SQLException e) {
+                                messageToClient.println(e.getMessage());
+                            }
                         }
-                        userDAO.initialize(currentUser.getUsername(), currentUser.getPassword());
-                        currentUser = userDAO.getUser();
                     }
                     TaskDAO taskDAO = new TaskDAO(currentUser);
 

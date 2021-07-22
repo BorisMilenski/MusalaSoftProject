@@ -1,9 +1,8 @@
 package entities;
 
+import javax.xml.bind.DatatypeConverter;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
-
 public class User {
     private int id;
     private String username;
@@ -60,8 +59,8 @@ public class User {
         private String mask (String string) {
             try {
                 MessageDigest md = MessageDigest.getInstance("MD5");
-                byte [] arr = md.digest(string.getBytes());
-                return Base64.getEncoder().encodeToString(arr);
+                byte [] digest = md.digest(string.getBytes());
+                return DatatypeConverter.printHexBinary(digest);
             } catch (NoSuchAlgorithmException e) {
                 return string;
             }
