@@ -18,7 +18,7 @@ The project aims to assist in day-to-day task management by providing an easy-to
     + Requirements: MySQL Server
     + Run the Database setup script, which is located in the repository, in MySQL Workbench. You'd need permissions to create and manage a database, as well as create and manage users. It will setup the database with some sample data. It wlll also create a user that is used by the server to access the database.
     + Run the ServerApp. This can be done directly from an executable jar, using the run.bat file, located in out\artifacts\server_jar, or from Intellij.
-    + Run the ClientApp. This can be done directly from an executable jar, using the run.bat file, located in out\artifacts\server_jar, or from Intellij.
+    + Run the ClientApp. This can be done directly from an executable jar, using the run.bat file, located in out\artifacts\client_jar, or from Intellij.
 
 
 4. How to Use guide
